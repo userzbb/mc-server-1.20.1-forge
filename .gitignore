@@ -8,6 +8,9 @@
 # 备份文件
 *.bak
 
+# MCSManager 运行时数据
+/mcsm/
+
 # 系统文件
 System Volume Information/
 

@@ -32,3 +32,31 @@ services:
     volumes:
       - ./ddns-go-data:/root
     restart: unless-stopped
+
+  ## ========== MCSManager Web 管理面板 ==========
+  mcsm-web:
+    image: githubyumao/mcsmanager-web:latest
+    container_name: mcsm-web
+    ports:
+      - "23333:23333"                # ✅ Web 管理界面端口
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - ./mcsm/web/data:/opt/mcsmanager/web/data   # Web 数据持久化
+      - ./mcsm/web/logs:/opt/mcsmanager/web/logs   # Web 日志持久化
+    restart: unless-stopped
+
+  ## ========== MCSManager 守护进程 ==========
+  mcsm-daemon:
+    image: githubyumao/mcsmanager-daemon:latest
+    container_name: mcsm-daemon
+    ports:
+      - "24444:24444"                # ✅ 守护进程 API 端口
+    environment:
+      - MCSM_DOCKER_WORKSPACE_PATH=/opt/mcsmanager/daemon/data/InstanceData
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./mcsm/daemon/data:/opt/mcsmanager/daemon/data   # 守护进程数据持久化
+      - ./mcsm/daemon/logs:/opt/mcsmanager/daemon/logs   # 守护进程日志持久化
+      - /var/run/docker.sock:/var/run/docker.sock       # 让面板能管理 Docker
+    restart: unless-stopped
