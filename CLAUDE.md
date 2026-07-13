@@ -69,7 +69,7 @@ docker exec mcsm-web node -e "const http = require('http'); http.get('http://cat
 ```
 
 关键要求：
-- `cwd` **不能为空或 null**，设成 `data/InstanceData/<UUID>` 的相对路径
+- `cwd` **不能为空或 null**，设成 `data/InstanceData`（daemon 自动追加实例 UUID）
 - `ports` 是字符串 `"宿主机:容器/协议"`，不是对象
 - `env` 是 `"KEY=VALUE"` 字符串，不是 `{key, value}` 对象
 - `extraVolumes` 用 `|` 分隔，格式 `"宿主机路径|容器路径|模式"`
