@@ -50,13 +50,19 @@
 
 1. 在节点页面，点右上角 **「创建实例」**
 2. 弹出窗口中选择：
+
+   **必填字段：**
    - **类型：** `Minecraft Java 版`
    - **版本：** `Forge 1.20.1`
    - **实例名称：** 随意填写，如 `Forge 1.20.1`
-   - **宿主机工作目录：** 选填，留空即可
-     - **留空时：** 默认创建在 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData/<实例UUID>/`
-     - **如果要填：** 写完整的绝对路径，例如 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData`
-     - 这个目录里存放实例的 Mod、世界存档、配置文件等所有数据
+
+   **选填字段（全部留空即可）：**
+   - **宿主机工作目录：** 留空
+     - 默认创建在 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData/<实例UUID>/`
+   - **启动命令：** 留空（镜像自带默认入口）
+   - **关闭实例命令：** 留空，默认的 `^C` 就行（Docker 模式会自动 stop）
+   - **安装服务端命令：** 留空（镜像会自动下载 Forge）
+   - **配置更新命令：** 留空
 3. 点 **「确认创建」**
 4. 等待几秒，实例创建完成
 
