@@ -137,6 +137,7 @@ docker compose restart mcsm-web
 | [GUI操作指南](docs/GUI操作指南.md) | 人类 | 面板每一步怎么点、字段填什么 |
 | [操作手册](docs/操作手册.md) | AI / Agent | 项目结构、命令、排查步骤 |
 | [迁移指南](docs/迁移指南.md) | 人类 / AI | 换机器时如何恢复整个服务器 |
+| [实例配置说明](docs/实例配置说明.md) | 人类 / AI | Docker 配置详情（端口、环境变量、挂载卷） |
 
 ## 📄 项目结构
 
