@@ -130,16 +130,30 @@ docker compose restart mcsm-web
 | 24454/udp | 语音聊天 |
 | 9876/tcp+udp | DDNS-GO |
 
+## 📚 详细文档
+
+| 文档 | 适合谁 | 内容 |
+|------|--------|------|
+| [GUI操作指南](docs/GUI操作指南.md) | 人类 | 面板每一步怎么点、字段填什么 |
+| [操作手册](docs/操作手册.md) | AI / Agent | 项目结构、命令、排查步骤 |
+| [迁移指南](docs/迁移指南.md) | 人类 / AI | 换机器时如何恢复整个服务器 |
+
 ## 📄 项目结构
 
 ```
 ~/minecraft-server/
-├── docker-compose.yml      # 服务定义
+├── docker-compose.yml          # 服务定义
+├── instance-config.json        # Docker 实例配置模板
+├── server.properties.template  # 服务端配置模板
 ├── README.md
-├── mod-list.md             # Mod 清单
-├── credentials.md          # 🔑 凭据（已 gitignore）
-├── docs/操作手册.md         # 详细运维指南
-├── mods/                   # Mod jar 文件
-├── mcsm/                   # MCSManager 数据
-└── ddns-go-data/           # DDNS 配置
+├── mod-list.md                 # Mod 完整清单
+├── CLAUDE.md                   # AI 指令
+├── credentials.md              # 🔑 凭据（已 gitignore）
+├── docs/
+│   ├── 操作手册.md              # AI 详细运维指令
+│   ├── GUI操作指南.md           # 面板操作步骤
+│   └── 迁移指南.md              # 迁移恢复步骤
+├── mods/                       # Mod jar 文件
+├── mcsm/                       # MCSManager 数据
+└── ddns-go-data/               # DDNS 配置
 ```
