@@ -9,62 +9,22 @@
     "startCommand": "",
     "stopCommand": "^c",
     "ports": [
-      {
-        "host": "25565",
-        "container": "25565",
-        "type": "tcp"
-      },
-      {
-        "host": "25575",
-        "container": "25575",
-        "type": "tcp"
-      },
-      {
-        "host": "24454",
-        "container": "24454",
-        "type": "udp"
-      }
+      "25565:25565/tcp",
+      "25575:25575/tcp",
+      "24454:24454/udp"
     ],
     "extraVolumes": [
-      {
-        "host": "/home/yuan/minecraft-server/mods",
-        "container": "/mods",
-        "mode": "ro"
-      }
+      "/home/yuan/minecraft-server/mods|/mods|ro"
     ],
     "env": [
-      {
-        "key": "EULA",
-        "value": "TRUE"
-      },
-      {
-        "key": "TYPE",
-        "value": "FORGE"
-      },
-      {
-        "key": "VERSION",
-        "value": "1.20.1"
-      },
-      {
-        "key": "FORGE_VERSION",
-        "value": "47.4.21"
-      },
-      {
-        "key": "ONLINE_MODE",
-        "value": "false"
-      },
-      {
-        "key": "MEMORY",
-        "value": "4G"
-      },
-      {
-        "key": "MAX_PLAYERS",
-        "value": "20"
-      },
-      {
-        "key": "TZ",
-        "value": "Asia/Shanghai"
-      }
+      "EULA=TRUE",
+      "TYPE=FORGE",
+      "VERSION=1.20.1",
+      "FORGE_VERSION=47.4.21",
+      "ONLINE_MODE=false",
+      "MEMORY=4G",
+      "MAX_PLAYERS=20",
+      "TZ=Asia/Shanghai"
     ],
     "workingDir": "/data",
     "changeWorkdir": true,
