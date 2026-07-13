@@ -80,6 +80,13 @@ docker compose up -d
 
 ### 如果守护进程离线
 
+**最快恢复：**
+```bash
+docker compose restart mcsm-web
+```
+重启后节点配置自动加载。
+
+**如果不行，再手动添加：**
 面板 → 左侧「节点」→「添加节点」：
 
 | 字段 | 值 |
