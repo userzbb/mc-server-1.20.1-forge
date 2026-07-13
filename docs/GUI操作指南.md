@@ -117,6 +117,16 @@ docker compose restart mcsm-web
 
 保存设置。
 
+### 安装整合包
+
+在「环境变量」里加一条 `CF_SERVER_MOD`，镜像会自动下载整合包：
+
+| 变量名 | 值 |
+|-------|-----|
+| `CF_SERVER_MOD` | `https://www.curseforge.com/minecraft/modpacks/<整合包名>` |
+
+首次启动时自动下载安装，等待即可。
+
 ---
 
 ## 四、上传 Mod
@@ -130,6 +140,8 @@ docker compose restart mcsm-web
 - 或者用 **「远程下载」** 输入 Mod 直链
 
 **Mod 源文件位置：** `~/minecraft-server/mods/` 目录下，可以直接从这里上传。
+
+> ⚠️ 创建新实例时不要默认挂载 `mods/` 目录，除非用户明确要求。
 
 ---
 
