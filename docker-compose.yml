@@ -39,6 +39,8 @@ services:
     container_name: mcsm-web
     ports:
       - "23333:23333"                # ✅ Web 管理界面端口
+    extra_hosts:
+      - "catzizimiku.top:host-gateway"  # 后端通过网关→主机→daemon
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./mcsm/web/data:/opt/mcsmanager/web/data   # Web 数据持久化
