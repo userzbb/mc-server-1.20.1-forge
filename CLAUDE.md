@@ -45,6 +45,18 @@ Mod 文件放在 `mods/` 目录，通过 Docker 卷挂载到容器的 `/mods`。
 **⚠️ 重要：添加 Mod 前必须询问用户**
 创建新实例时，**不要**默认挂载整个 `mods/` 目录。只有用户明确要求添加特定 Mod 时，才通过面板文件管理上传或配置挂载卷。
 
+## 安装整合包
+
+在 Docker 环境变量中设置 `CF_SERVER_MOD` 即可让镜像自动下载安装 CurseForge 整合包：
+
+```json
+"env": ["CF_SERVER_MOD=https://www.curseforge.com/minecraft/modpacks/<整合包名>"]
+```
+
+首次启动自动安装。之后如需添加额外 Mod：
+- **自动（挂载卷）：** 在 `extraVolumes` 加 `"/host/path|/mods|ro"`
+- **手动（面板）：** 实例 → 文件管理 → 上传 `.jar` 到 `mods/`
+
 
 ## 网络架构
 
