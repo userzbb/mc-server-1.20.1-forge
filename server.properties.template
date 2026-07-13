@@ -1,0 +1,20 @@
+#Minecraft server properties
+online-mode=false
+server-port=25565
+difficulty=easy
+max-players=20
+motd=A Minecraft Forge 1.20.1 Server
+enable-rcon=true
+rcon.port=25575
+rcon.password=change_me
+level-type=default
+spawn-protection=16
+view-distance=10
+simulation-distance=10
+max-tick-time=60000
+allow-nether=true
+generate-structures=true
+gamemode=survival
+hardcore=false
+pvp=true
+enable-command-block=false
