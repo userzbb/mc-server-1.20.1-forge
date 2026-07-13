@@ -1,127 +1,41 @@
 # 🧱 Minecraft Forge 服务器
 
 > **版本：** Forge 1.20.1 (47.4.21)
+> **域名：** `catzizimiku.top`（IPv6 直连）
 > **运行环境：** Docker (itzg/minecraft-server:java17)
 
-## 🚀 快速启动
+## 🚀 一键启动
 
 ```bash
-# 启动服务器（后台运行）
+cd ~/minecraft-server
 docker compose up -d
-
-# 查看日志
-docker compose logs -f mc-forge
-
-# 停止服务器
-docker compose stop
-
-# 完全停止并删除容器
-docker compose down
 ```
 
-首次启动需要下载安装 Forge 并加载所有 mod，**约 3-5 分钟**。请耐心等待，看到以下日志即为启动完成：
+首次启动约 **3-5 分钟**，看到 `Done (XX.XXXs)! For help, type "help"` 即为完成。
 
-```
-[DedicatedServer]: Done (XX.XXXs)! For help, type "help"
-```
+## 🔗 访问地址
 
-服务器端口对外开放。防火墙需要放行以下端口：
+| 服务 | 地址 |
+|------|------|
+| Minecraft 游戏 | `catzizimiku.top:25565` |
+| MCSManager 面板 | `http://catzizimiku.top:23333`（HTTP） |
+| DDNS-GO 管理 | `http://catzizimiku.top:9876` |
 
-| 端口 | 协议 | 用途 |
-|------|------|------|
-| 25565 | TCP | Minecraft 游戏连接 |
-| 25575 | TCP | RCON 远程管理 |
-| 24454 | UDP | 语音聊天 (Voice Chat) |
-| 23333 | TCP | MCSManager Web 管理面板 |
-| 24444 | TCP | MCSManager 守护进程 API |
-| 9876 | TCP | DDNS-GO 管理界面 (host 网络直通) |
+> ⚠️ 所有服务走 IPv6，不需要端口转发。MCSManager 用 **HTTP** 不是 HTTPS。
 
-## 📦 Mod 列表
+## 📦 Mod 清单
 
-本服务器安装了 **85 个 Mod**，详细清单请查看 [mod-list.md](mod-list.md)。
+85 个 Mod，详见 [mod-list.md](mod-list.md)。
 
-## 🔧 配置
-
-### 环境变量（docker-compose）
-
-| 变量 | 值 | 说明 |
-|------|-----|------|
-| `MEMORY` | 4G | 分配内存 |
-| `MAX_PLAYERS` | 20 | 最大玩家数 |
-| `ONLINE_MODE` | false | 离线模式（允许非正版） |
-| `VERSION` | 1.20.1 | Minecraft 版本 |
-| `FORGE_VERSION` | 47.4.21 | Forge 版本 |
-
-### RCON 管理
-
-已开启 RCON，端口 `25575`。密码在 `data/server.properties` 中的 `rcon.password` 字段。
-
-## 🐳 Docker Compose 服务
+## 🐳 服务架构
 
 | 服务 | 说明 |
 |------|------|
-| **mc-forge** | Minecraft Forge 服务器 |
-| **mcsm-web** | MCSManager Web 管理面板 |
+| **mc-forge** | Forge 1.20.1 服务器 |
+| **mcsm-web** | MCSManager Web 面板 |
 | **mcsm-daemon** | MCSManager 守护进程 |
-| **ddns-go** | 动态域名解析服务 |
+| **ddns-go** | 动态域名解析（阿里云 DNS） |
 
----
+## 📖 操作手册
 
-### 🎮 MCSManager 管理面板
-
-MCSManager 是一款免费的 Web 面板，可用于管理游戏服务器。
-
-**访问地址：** `http://你的IP:23333`
-
-**首次配置：**
-1. 打开浏览器访问 `http://你的IP:23333`
-2. 注册一个管理员账号
-3. 登录后点击顶部 **节点 (Nodes)** → **添加节点**
-4. 填写节点信息：
-   - 名称：`主服务器`
-   - IP 地址：你服务器的 IP
-   - 端口：`24444`
-   - 密钥：`3fa29ec75e5f4c66cbb29eed3de41b798e73b18f29061fe`
-5. 点击确认，节点状态变绿即为连接成功
-
-**⚠️ 关于现有 mc-forge 服务：**
-`mc-forge` 是通过 docker-compose 直接启动的，不在 MCSManager 管理范围内。
-你可以用 MCSManager 创建**新的**游戏服务器实例（支持一键开服、Mod 管理、文件管理）。
-
-> 守护进程访问密钥记录在此 README 中，可随时通过 `docker logs mcsm-daemon 2>&1 | grep "Access Key"` 查看。
-
----
-
-### 🌐 DDNS-GO 动态域名解析
-
-DDNS-GO 用于将你的公网 IP 自动绑定到域名，这样玩家可以通过域名连接服务器，IP 变了也不受影响。
-
-**配置文件位置：** `ddns-go-data/.ddns_go_config.yaml`
-
-**当前配置：**
-| 项目 | 内容 |
-|------|------|
-| 域名 | `catzizimiku.top` |
-| DNS 服务商 | 阿里云 DNS (Alidns) |
-| IPv4 | ✅ 启用（URL 获取公网 IP） |
-| IPv6 | ✅ 启用 |
-| Web 管理端口 | `9876`（host 网络直通） |
-
-**配置方式：**
-1. 直接访问 `http://你的IP:9876` 进入 Web 管理界面
-2. 或在 `ddns-go-data/.ddns_go_config.yaml` 中编辑配置
-3. 修改后重启生效：
-   ```bash
-   docker compose restart ddns-go
-   ```
-
-> ⚠️ 配置文件包含 DNS 服务商的 API 密钥，已加入 `.gitignore`，不会提交到 git。
-
-## 🔄 更新 Mod
-
-1. 下载新的 `.jar` 文件放到 `mods/` 目录
-2. 重启服务器：
-   ```bash
-   docker compose down
-   docker compose up -d
-   ```
+详细配置和运维说明请见 [docs/操作手册.md](docs/操作手册.md)。
