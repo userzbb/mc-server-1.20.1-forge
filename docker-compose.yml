@@ -1,0 +1,34 @@
+services:
+  ## Minecraft Forge 服务器（1.20.1）
+  mc-forge:
+    image: itzg/minecraft-server:java17
+    container_name: mc-forge
+    ports:
+      - "25565:25565"                # ✅ Minecraft 游戏端口
+      - "25575:25575"                # ✅ RCON 远程管理端口
+      - "24454:24454/udp"            # ✅ 语音聊天 (Voice Chat) 端口
+    environment:
+      EULA: "TRUE"
+      TYPE: "FORGE"
+      VERSION: "1.20.1"
+      FORGE_VERSION: "47.4.21"
+      ONLINE_MODE: "false"
+      MEMORY: "4G"
+      MAX_PLAYERS: "20"
+      TZ: "Asia/Shanghai"
+    volumes:
+      - ./data:/data
+      - ./mods:/mods:ro
+    restart: unless-stopped
+
+  ## DDNS-GO（动态域名解析）
+  ddns-go:
+    image: jeessy/ddns-go:latest
+    container_name: ddns-go
+    network_mode: "host"             # ✅ 使用 host 网络，直接占用宿主机 9876 端口
+    # 如果你想用端口映射，注释掉上面那行，改用下面这两行：
+    # ports:
+    #   - "9876:9876"
+    volumes:
+      - ./ddns-go-data:/root
+    restart: unless-stopped

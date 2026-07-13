@@ -1,0 +1,19 @@
+# Minecraft 服务器运行数据（世界、日志、缓存、配置等）
+# 这些由 docker 容器自动生成和管理
+/data/
+
+# DDNS-GO 运行时数据
+/ddns-go-data/
+
+# 备份文件
+*.bak
+
+# 系统文件
+System Volume Information/
+
+# Claude Code 配置
+.claude/
+claude-resume
+
+# Mod 文件（二进制，用 mod-list.md 记录清单）
+/mods/*.jar
