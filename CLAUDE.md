@@ -27,8 +27,20 @@ Minecraft 服务器通过 MCSManager 面板创建 Docker 实例，不直接由 d
 | `server.properties.template` | 服务端配置模板 | ✅ |
 | `mod-list.md` | 84 个 Mod 清单 | ✅ |
 | `mods/*.jar` | Mod 二进制文件 | ❌ gitignore |
-| `mcsm/` | MCSManager 运行时数据 | ❌ gitignore |
+| `mcsm/` | MCSManager 运行时数据（含实例数据） | ❌ gitignore |
 | `docs/` | 操作手册、GUI指南、迁移指南 | ✅ |
+
+## Mod 管理
+
+Mod 文件放在 `mods/` 目录，通过 Docker 卷挂载到容器的 `/mods`。
+
+**添加：** 复制 `.jar` 到 `mods/` → 重启实例（镜像自动复制到实例的 `/data/mods`）
+
+**删除：** 需要同时删除两处：
+1. `mods/<文件名>.jar`（源文件）
+2. `mcsm/daemon/data/InstanceData/<UUID>/mods/<文件名>.jar`（实例数据目录）
+
+否则重启后旧文件还在。镜像只会复制文件，不会同步删除。
 
 ## 网络架构
 
