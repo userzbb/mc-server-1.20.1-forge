@@ -2,7 +2,7 @@
   "nickname": "Forge 1.20.1",
   "processType": "docker",
   "type": "minecraft",
-  "cwd": null,
+  "cwd": "",
   "docker": {
     "image": "itzg/minecraft-server:java17",
     "containerName": "mc-forge",
