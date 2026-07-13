@@ -2,7 +2,7 @@
   "nickname": "Forge 1.20.1",
   "processType": "docker",
   "type": "minecraft",
-  "cwd": "/data",
+  "cwd": "",
   "docker": {
     "image": "itzg/minecraft-server:java17",
     "containerName": "mc-forge",
@@ -27,7 +27,6 @@
       "TZ=Asia/Shanghai"
     ],
     "workingDir": "/data",
-    "changeWorkdir": true,
     "memory": 0,
     "networkMode": "bridge"
   }
