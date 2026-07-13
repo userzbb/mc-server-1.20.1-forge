@@ -106,7 +106,7 @@ docker compose restart mcsm-web
 
 ## 📦 Mod 列表
 
-85 个 Mod，完整清单见 **[mod-list.md](mod-list.md)**。
+84 个 Mod，完整清单见 **[mod-list.md](mod-list.md)**。
 
 ### 不能装的 Mod（会导致崩溃）
 

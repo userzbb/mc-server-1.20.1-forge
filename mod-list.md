@@ -79,7 +79,6 @@
 |-----|--------|------|
 | Xaero's Minimap 26.2.0 | xaerominimap-forge-1.20.1-26.2.0.jar | 小地图 |
 | Xaero's World Map 1.42.0 | xaeroworldmap-forge-1.20.1-1.42.0.jar | 大地图 |
-| The One Probe 10.0.3 | theoneprobe-1.20.1-10.0.3.jar | 方块信息 |
 | Jade 11.13.2 | Jade-1.20.1-Forge-11.13.2.jar | 方块信息扩展 |
 | GuideME 20.1.15 | guideme-20.1.15.jar | 游戏内指南 |
 
