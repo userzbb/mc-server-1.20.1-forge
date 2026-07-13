@@ -53,9 +53,10 @@
    - **类型：** `Minecraft Java 版`
    - **版本：** `Forge 1.20.1`
    - **实例名称：** 随意填写，如 `Forge 1.20.1`
-   - **宿主机工作目录：** 选填，留空即可（默认自动创建）
-     - 如果要填，写 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData`
-     - 实例数据（Mod、存档、配置）会存在这个目录下以实例 UUID 命名的文件夹里
+   - **宿主机工作目录：** 选填，留空即可
+     - **留空时：** 默认创建在 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData/<实例UUID>/`
+     - **如果要填：** 写完整的绝对路径，例如 `/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData`
+     - 这个目录里存放实例的 Mod、世界存档、配置文件等所有数据
 3. 点 **「确认创建」**
 4. 等待几秒，实例创建完成
 
