@@ -167,6 +167,22 @@ docker compose restart mcsm-daemon
 
 所有密码和密钥在 `credentials.md`（已 gitignore），不要硬编码到任何跟踪的文件中。
 
+## 备份与恢复
+
+```bash
+# 交互式备份（菜单选择实例）
+./scripts/backup.sh
+./scripts/backup.sh --list       # 列出实例
+
+# 交互式恢复（菜单选择实例+模式）
+./scripts/restore.sh
+./scripts/restore.sh --list      # 列出备份
+
+# 直接指定实例
+./scripts/backup.sh forge-1.20.1
+./scripts/restore.sh forge-1.20.1 world  # 世界回档
+```
+
 ## 常见问题
 
 | 问题 | 原因 | 解决 |

@@ -201,3 +201,20 @@ docker compose restart mcsm-web
 
 **3. 手动添加节点：**
 见上面「二、添加节点」。
+
+---
+
+## 九、命令行备份
+
+也有命令行脚本可以用（配合 crontab 定时备份更方便）：
+
+```bash
+# 交互式备份（菜单选实例）
+./scripts/backup.sh
+
+# 列出可备份的实例
+./scripts/backup.sh --list
+
+# 备份指定实例
+./scripts/backup.sh forge-1.20.1
+```
