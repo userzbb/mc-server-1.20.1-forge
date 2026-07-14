@@ -114,6 +114,16 @@ do_restore() {
   run_sudo cp -r "$old_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null
   echo "✅ 实例数据已恢复（mod、世界、配置）"
 
+  # 检测损坏文件（0 字节），从备份重新复制
+  local bad_count=$(find "$MCSM_DIR/InstanceData/$uuid" -name "*.jar" -size 0 2>/dev/null | wc -l)
+  if [ "$bad_count" -gt 0 ]; then
+    echo "⚠️  发现 $bad_count 个损坏文件，正在重新复制..."
+    find "$MCSM_DIR/InstanceData/$uuid" -name "*.jar" -size 0 -delete 2>/dev/null
+    run_sudo cp -r "$old_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null
+    local bad_after=$(find "$MCSM_DIR/InstanceData/$uuid" -name "*.jar" -size 0 2>/dev/null | wc -l)
+    [ "$bad_after" -eq 0 ] && echo "✅ 已修复" || echo "⚠️  仍有 $bad_after 个损坏文件，请手动检查"
+  fi
+
   # 复制 InstanceConfig 并更新 UUID
   local old_config=""
   if [ -f "$tmpdir/InstanceConfig/$old_uuid.json" ]; then
