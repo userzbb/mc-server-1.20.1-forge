@@ -131,7 +131,7 @@ c['docker']['containerName'] = 'mc-$NAME'
 with open('$tmpconfig', 'w') as f:
     json.dump(c, f, indent=2, ensure_ascii=False)
 " 2>/dev/null
-        cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json"
+        sudo cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null || cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json"
         rm -f "$tmpconfig"
         echo "✅ Docker 配置已从模板应用"
       fi
