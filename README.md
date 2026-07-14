@@ -132,15 +132,13 @@ docker compose restart mcsm-web
 ## 💾 备份
 
 ```bash
-# 一键备份（forge 实例）
-./backup.sh
+# 一键备份
+./scripts/backup.sh forge-1.20.1
+./scripts/backup.sh tacz-craft
 
-# 备份 tacz 实例
-./backup.sh 71dedd089a9c4affaa3c811a8e722be8
-
-# 定时备份（每天凌晨 4 点）
-crontab -e
-# 添加: 0 4 * * * /home/yuan/minecraft-server/backup.sh
+# 一键恢复
+./scripts/restore.sh forge-1.20.1 world
+./scripts/restore.sh forge-1.20.1 --full
 ```
 
 备份文件在 `backups/` 目录，保留 30 天自动清理。
@@ -177,14 +175,18 @@ crontab -e
 ├── README.md
 ├── CLAUDE.md                   # AI 指令
 ├── credentials.md              # 🔑 凭据（已 gitignore）
+├── scripts/
+│   ├── backup.sh               # 备份脚本
+│   └── restore.sh              # 恢复脚本
 ├── instances/
 │   ├── forge-1.20.1/
-│   │   └── mod-list.md         # forge 实例 Mod 清单（84 个）
+│   │   └── mod-list.md         # forge 实例 Mod 清单（91 个）
 │   └── tacz-craft/
-│       ├── mod-list.md         # tacz 实例 Mod 清单（95 个）
+│       ├── mod-list.md         # tacz 实例 Mod 清单（85 个）
 │       └── server.properties.template
 ├── docs/                       # 操作手册、GUI指南、迁移指南
 ├── mods/                       # Mod jar 文件
 ├── mcsm/                       # MCSManager 数据
-└── ddns-go-data/               # DDNS 配置
+├── ddns-go-data/               # DDNS 配置
+└── backups/                    # 备份文件（gitignore）
 ```
