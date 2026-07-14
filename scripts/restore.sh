@@ -98,15 +98,25 @@ if [ $# -eq 0 ]; then
   select_backup
   backup_name=$(basename "$SELECTED_BACKUP" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
   echo ""
-  # 2. 显示已有实例，或新建
-  echo "已有实例（可直接恢复）:"
+  # 2. 选择已有实例或新建
+  echo "已有实例:"
+  instances=()
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
     n=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
-    [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "  - $n"
+    [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && instances+=("$n")
   done
+  for i in "${!instances[@]}"; do
+    echo "  $((i+1)). ${instances[$i]}"
+  done
+  echo "  $(( ${#instances[@]} + 1 )). 新建实例 (默认: $backup_name)"
   echo ""
-  read -p "恢复到实例 ($backup_name): " NAME
-  NAME="${NAME:-$backup_name}"
+  read -p "选择实例 (1-$(( ${#instances[@]} + 1 ))): " choice
+  if [ "$choice" = "$(( ${#instances[@]} + 1 ))" ] || [ -z "$choice" ]; then
+    read -p "新实例名称 ($backup_name): " NAME
+    NAME="${NAME:-$backup_name}"
+  else
+    NAME="${instances[$((choice-1))]}"
+  fi
   # 3. 选模式
   echo ""
   echo "恢复模式:"
