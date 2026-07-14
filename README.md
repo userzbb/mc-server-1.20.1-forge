@@ -138,8 +138,8 @@ docker compose restart mcsm-web
 扫描 `mcsm/daemon/data/InstanceConfig/` 自动匹配实例名 → UUID，不需要手动输 ID。
 
 ```bash
-./scripts/backup.sh                    # 显示所有实例
-./scripts/backup.sh forge-1.20.1       # 备份 forge（世界+配置+节点+凭据+DDNS）
+./scripts/backup.sh                    # 交互菜单选择实例
+./scripts/backup.sh forge-1.20.1       # 直接备份指定实例
 ```
 
 备份内容：世界存档、实例 Docker 配置、MCSManager 节点配置、credentials.md、ddns-go-data。
