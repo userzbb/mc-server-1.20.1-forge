@@ -164,7 +164,26 @@ elif [ $# -eq 1 ]; then
     n=$(echo "$inst" | cut -d: -f2)
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
-  [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
+  [ -z "$UUID" ] && echo "ℹ️  实例 [$NAME] 不存在，将自动创建"
+  read -p "新实例名称 ($NAME): " new_name
+  NAME="${new_name:-$NAME}"
+  if [ -z "$UUID" ]; then
+    echo "实例 [$NAME] 不存在。选择:"
+    echo ""
+    read -p "新实例名称 ($NAME): " new_name
+    NAME="${new_name:-$NAME}"
+    echo "  1. 我去面板创建，再来恢复"
+    echo "  2. 自动创建配置文件，直接恢复"
+    read -p "选择 (1-2): " c
+    if [ "$c" = "2" ]; then
+      UUID=$(python3 scripts/auto_create.py "$NAME" "$MCSM_DIR/InstanceConfig")
+      [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
+      mkdir -p "$MCSM_DIR/InstanceData/$UUID"
+      echo "✅ 配置文件已创建"
+    else
+      exit 0
+    fi
+  fi
   select_mode
   read -p "继续? (y/N) " confirm; [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
@@ -175,7 +194,16 @@ elif [ $# -ge 2 ]; then
     n=$(echo "$inst" | cut -d: -f2)
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
-  [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
+  [ -z "$UUID" ] && echo "ℹ️  实例 [$NAME] 不存在，将自动创建"
+  read -p "新实例名称 ($NAME): " new_name
+  NAME="${new_name:-$NAME}"
+  if [ -z "$UUID" ]; then
+    echo "实例 [$NAME] 不存在，自动创建配置..."
+    UUID=$(python3 scripts/auto_create.py "$NAME" "$MCSM_DIR/InstanceConfig")
+    [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
+    mkdir -p "$MCSM_DIR/InstanceData/$UUID"
+    echo "✅ 配置已创建"
+  fi
   read -p "继续? (y/N) " confirm; [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
 fi
