@@ -1,195 +1,152 @@
 #!/bin/bash
 # Minecraft 服务器恢复脚本
 # 用法:
-#   ./restore.sh                    ← 交互选择实例和模式
-#   ./restore.sh forge-1.20.1 world ← 世界回档
+#   ./restore.sh                           ← 交互菜单
+#   ./restore.sh forge-1.20.1 world        ← 世界回档
+#   ./restore.sh forge-1.20.1 instance -y  ← 重建实例（跳过确认）
+#   ./restore.sh forge-1.20.1 --full -y    ← 完整迁移
 
 BACKUP_DIR="/home/yuan/minecraft-server/backups"
 MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; NC='\033[0m'
 
-# 获取实例列表（当前 + 备份中已删除的）
+# 获取实例列表
 get_instances() {
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
-    local nickname=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
-    local uuid=$(basename "$f" .json)
+    nickname=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
+    uuid=$(basename "$f" .json)
     [ -n "$nickname" ] && [ "$nickname" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "$uuid:$nickname"
   done
-  # 补充已删除但有备份的实例（不重复列出现有的）
-  local existing=$(for f in "$MCSM_DIR/InstanceConfig"/*.json; do python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null; done)
+  existing=$(for f in "$MCSM_DIR/InstanceConfig"/*.json; do python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null; done)
   for bf in "$BACKUP_DIR"/backup-*.tar.gz; do
-    local bname=$(basename "$bf" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
+    bname=$(basename "$bf" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
     [ -n "$bname" ] && echo "$existing" | grep -qx "$bname" || echo ":$bname"
   done | sort -u
 }
 
-# 交互选择实例
-select_instance() {
-  local instances=()
-  while IFS= read -r line; do instances+=("$line"); done < <(get_instances)
-  echo "可用实例:"
-  for i in "${!instances[@]}"; do
-    local u=$(echo "${instances[$i]}" | cut -d: -f1)
-    local n=$(echo "${instances[$i]}" | cut -d: -f2)
-    local tag=""
-    [ -z "$u" ] && tag=" (已删除)"
-    echo "  $((i+1)). $n$tag"
-  done
-  read -p "选择实例 (1-${#instances[@]}): " choice
-  local s="${instances[$((choice-1))]}"
-  UUID=$(echo "$s" | cut -d: -f1)
-  NAME=$(echo "$s" | cut -d: -f2)
-  if [ -z "$UUID" ]; then
-    echo "❌ 实例 [$NAME] 已从面板删除，无法恢复。请先在面板重建同名实例后重试。"
-    exit 1
-  fi
+# 自动补全 Docker 配置（从模板）
+apply_docker_config() {
+  python3 -c "
+import json, os, subprocess, sys
+uuid = '$1'
+cfg_path = '$2'
+name = '$3'
+with open(cfg_path) as f:
+    c = json.load(f)
+with open('/home/yuan/minecraft-server/instance-config.json') as t:
+    tmpl = json.load(t)
+c['processType'] = 'docker'
+c['cwd'] = f'data/InstanceData/{uuid}'
+c['docker'] = tmpl['docker']
+c['docker']['containerName'] = f'mc-{name}'
+try:
+    with open(cfg_path, 'w') as f:
+        json.dump(c, f, indent=2, ensure_ascii=False)
+except PermissionError:
+    data = json.dumps(c, indent=2, ensure_ascii=False)
+    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
+    if r.returncode != 0:
+        sys.exit(1)
+print('OK')
+" 2>/dev/null
 }
 
-# 交互选择模式
-select_mode() {
-  echo ""
-  echo "恢复模式:"
-  echo "  1. world     — 世界回档（只恢复 world/ + server.properties）"
-  echo "  2. instance  — 重建实例后恢复全部数据"
-  echo "  3. --full    — 完整迁移（含凭据、DDNS、节点配置）"
-  read -p "选择模式 (1-3): " m
-  case "$m" in
-    1) MODE="world" ;;
-    2) MODE="instance" ;;
-    3) MODE="--full" ;;
-    *) echo "无效选择"; exit 1 ;;
+# 恢复逻辑（世界/实例/完整）
+do_restore() {
+  local name="$1" mode="$2" uuid="$3"
+  local backup_file=$(ls -t "$BACKUP_DIR/backup-${name}-"*.tar.gz 2>/dev/null | head -1)
+
+  [ -z "$backup_file" ] && echo "❌ 未找到 $name 的备份" && exit 1
+
+  echo -e "${GREEN}========================================${NC}"
+  echo -e "${GREEN}  恢复 [$name] - $(basename "$backup_file")${NC}"
+  echo -e "${GREEN}  模式: $mode${NC}"
+  echo -e "${GREEN}========================================${NC}"
+
+  local old_uuid=$(tar -tzf "$backup_file" | grep "InstanceData/" | head -1 | cut -d/ -f9)
+
+  case "$mode" in
+    world)
+      echo "🔄 恢复世界存档..."
+      tar -xzf "$backup_file" --wildcards "*/world/*" "*/server.properties" "*/eula.txt" -C / 2>/dev/null
+      echo -e "${GREEN}✅ 世界已恢复。去面板启动实例即可。${NC}"
+      ;;
+    instance)
+      echo "🔄 恢复实例全部数据..."
+      tar -xzf "$backup_file" -C / 2>/dev/null
+      if [ -n "$old_uuid" ] && [ "$old_uuid" != "$uuid" ]; then
+        echo "ℹ️  UUID 已变更 ($old_uuid → $uuid)，迁移数据..."
+        [ -d "$MCSM_DIR/InstanceData/$old_uuid" ] && mv "$MCSM_DIR/InstanceData/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$old_uuid"
+      fi
+      if ! tar -tzf "$backup_file" 2>/dev/null | grep -q "InstanceConfig/"; then
+        echo "ℹ️  备份中无实例配置，从模板补全 Docker 配置..."
+        apply_docker_config "$uuid" "$MCSM_DIR/InstanceConfig/$uuid.json" "$name"
+        echo "✅ Docker 配置已从模板应用"
+      else
+        [ -f "$MCSM_DIR/InstanceConfig/$old_uuid.json" ] && mv "$MCSM_DIR/InstanceConfig/$old_uuid.json" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
+      fi
+      echo -e "${GREEN}✅ 实例数据已恢复。重启 daemon 后启动实例。${NC}"
+      docker compose restart mcsm-daemon 2>/dev/null
+      ;;
+    --full)
+      echo "🔄 完整恢复..."
+      tar -xzf "$backup_file" -C / 2>/dev/null
+      if [ -n "$old_uuid" ] && [ "$old_uuid" != "$uuid" ]; then
+        echo "ℹ️  UUID 已变更，迁移数据..."
+        [ -d "$MCSM_DIR/InstanceData/$old_uuid" ] && mv "$MCSM_DIR/InstanceData/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$old_uuid"
+      fi
+      if ! tar -tzf "$backup_file" 2>/dev/null | grep -q "InstanceConfig/"; then
+        echo "ℹ️  备份中无实例配置，从模板补全 Docker 配置..."
+        apply_docker_config "$uuid" "$MCSM_DIR/InstanceConfig/$uuid.json" "$name"
+        echo "✅ Docker 配置已从模板应用"
+      else
+        [ -f "$MCSM_DIR/InstanceConfig/$old_uuid.json" ] && mv "$MCSM_DIR/InstanceConfig/$old_uuid.json" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
+      fi
+      echo -e "${GREEN}✅ 全部数据已恢复。重启 daemon 后启动实例。${NC}"
+      docker compose restart mcsm-daemon 2>/dev/null
+      ;;
   esac
 }
 
-# 查找最新备份
-find_backup() {
-  echo "$BACKUP_DIR/backup-${NAME}-"*.tar.gz 2>/dev/null | sort -r | head -1
-}
+# ---- 主流程 ----
 
-# 无参数 → 交互选择
+# 解析 -y 参数
+SKIP_CONFIRM=false
+ARGS=()
+for arg in "$@"; do
+  [ "$arg" = "-y" ] && SKIP_CONFIRM=true || ARGS+=("$arg")
+done
+set -- "${ARGS[@]}"
+
 if [ $# -eq 0 ]; then
+  # 交互模式
   select_instance
   select_mode
+  echo "⚠️  请先确认面板上已停止实例!"
+  read -p "继续? (y/N) " confirm
+  [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
+  do_restore "$NAME" "$MODE" "$UUID"
+
 elif [ $# -eq 1 ]; then
+  # 只有实例名，交互选模式
   NAME="$1"
-  select_mode
-else
-  NAME="$1"
-  MODE="$2"
-  # 按名称匹配 UUID
   for inst in $(get_instances); do
-    local n=$(echo "$inst" | cut -d: -f2)
+    n=$(echo "$inst" | cut -d: -f2)
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
+  [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
+  select_mode
+  [ "$SKIP_CONFIRM" = false ] && read -p "继续? (y/N) " confirm && [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
+  do_restore "$NAME" "$MODE" "$UUID"
+
+elif [ $# -ge 2 ]; then
+  NAME="$1"; MODE="$2"
+  for inst in $(get_instances); do
+    n=$(echo "$inst" | cut -d: -f2)
+    [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
+  done
+  [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
+  [ "$SKIP_CONFIRM" = false ] && read -p "继续? (y/N) " confirm && [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
+  do_restore "$NAME" "$MODE" "$UUID"
 fi
-
-[ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
-
-BACKUP_FILE=$(find_backup)
-[ -z "$BACKUP_FILE" ] && echo "❌ 未找到 $NAME 的备份" && exit 1
-
-echo -e "${GREEN}========================================${NC}"
-echo -e "${GREEN}  恢复 [$NAME] - $(basename "$BACKUP_FILE")${NC}"
-echo -e "${GREEN}  模式: $MODE${NC}"
-echo -e "${GREEN}========================================${NC}"
-echo "⚠️  请先确认面板上已停止实例!"
-read -p "继续? (y/N) " confirm
-[ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
-
-case "$MODE" in
-  world)
-    echo "🔄 恢复世界存档..."
-    tar -xzf "$BACKUP_FILE" --wildcards "*/world/*" "*/server.properties" "*/eula.txt" -C / 2>/dev/null
-    echo -e "${GREEN}✅ 世界已恢复。去面板启动实例即可。${NC}"
-    ;;
-  instance)
-    echo "🔄 恢复实例全部数据..."
-    # 找出备份中的旧 UUID
-    OLD_UUID=$(tar -tzf "$BACKUP_FILE" | grep "InstanceData/" | head -1 | cut -d/ -f9)
-    tar -xzf "$BACKUP_FILE" -C / 2>/dev/null
-    # 如果 UUID 变了，自动迁移数据
-    if [ -n "$OLD_UUID" ] && [ "$OLD_UUID" != "$UUID" ]; then
-      echo "ℹ️  UUID 已变更 ($OLD_UUID → $UUID)，正在迁移数据..."
-      [ -d "$MCSM_DIR/InstanceData/$OLD_UUID" ] && mv "$MCSM_DIR/InstanceData/$OLD_UUID"/* "$MCSM_DIR/InstanceData/$UUID"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$OLD_UUID"
-    fi
-    # 如果备份中没有 InstanceConfig（实例已删除后备份的），自动应用模板配置
-    if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
-      echo "ℹ️  备份中无实例配置，从 instance-config.json 模板自动配置 Docker 模式..."
-      if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        python3 -c "
-import json, os
-uuid = '$UUID'
-cfg_path = '$MCSM_DIR/InstanceConfig/$UUID.json'
-with open(cfg_path) as f:
-    c = json.load(f)
-with open('/home/yuan/minecraft-server/instance-config.json') as t:
-    tmpl = json.load(t)
-c['processType'] = 'docker'
-c['cwd'] = f'data/InstanceData/{uuid}'
-c['docker'] = tmpl['docker']
-c['docker']['containerName'] = 'mc-$NAME'
-# 尝试直接写入，失败则用 sudo
-try:
-    with open(cfg_path, 'w') as f:
-        json.dump(c, f, indent=2, ensure_ascii=False)
-except PermissionError:
-    import subprocess
-    import sys
-    data = json.dumps(c, indent=2, ensure_ascii=False)
-    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
-    if r.returncode != 0:
-        print('ERROR: 无法写入配置文件 (权限不足)', file=sys.stderr)
-        exit(1)
-print('OK')
-" 2>/dev/null
-        echo "✅ Docker 配置已从模板应用"
-      fi
-    else
-      # 备份中有 InstanceConfig
-      [ -f "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" ] && mv "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null
-    fi
-    echo -e "${GREEN}✅ 实例数据已恢复。${NC}"
-    ;;
-  --full)
-    echo "🔄 完整恢复..."
-    OLD_UUID=$(tar -tzf "$BACKUP_FILE" | grep "InstanceData/" | head -1 | cut -d/ -f9)
-    tar -xzf "$BACKUP_FILE" -C / 2>/dev/null
-    if [ -n "$OLD_UUID" ] && [ "$OLD_UUID" != "$UUID" ]; then
-      echo "ℹ️  UUID 已变更 ($OLD_UUID → $UUID)，正在迁移数据..."
-      [ -d "$MCSM_DIR/InstanceData/$OLD_UUID" ] && mv "$MCSM_DIR/InstanceData/$OLD_UUID"/* "$MCSM_DIR/InstanceData/$UUID"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$OLD_UUID"
-    fi
-    if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
-      echo "ℹ️  备份中无实例配置，从模板自动配置 Docker 模式..."
-      if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        python3 -c "
-import json, os, subprocess, sys
-uuid = '$UUID'
-cfg_path = '$MCSM_DIR/InstanceConfig/$UUID.json'
-with open(cfg_path) as f:
-    c = json.load(f)
-with open('/home/yuan/minecraft-server/instance-config.json') as t:
-    tmpl = json.load(t)
-c['processType'] = 'docker'
-c['cwd'] = f'data/InstanceData/{uuid}'
-c['docker'] = tmpl['docker']
-c['docker']['containerName'] = 'mc-$NAME'
-try:
-    with open(cfg_path, 'w') as f:
-        json.dump(c, f, indent=2, ensure_ascii=False)
-except PermissionError:
-    data = json.dumps(c, indent=2, ensure_ascii=False)
-    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
-    if r.returncode != 0:
-        print('ERROR: 无法写入配置文件 (权限不足)', file=sys.stderr)
-        exit(1)
-print('OK')
-" 2>/dev/null
-        echo "✅ Docker 配置已从模板应用"
-      fi
-    else
-      [ -f "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" ] && mv "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null
-    fi
-    echo -e "${GREEN}✅ 全部数据已恢复。${NC}"
-    ;;
-esac
