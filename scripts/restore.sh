@@ -134,8 +134,13 @@ select_instance() {
   UUID=$(echo "$s" | cut -d: -f1)
   NAME=$(echo "$s" | cut -d: -f2)
   if [ -z "$UUID" ]; then
-    echo "❌ 实例 [$NAME] 已从面板删除。请先重建同名实例后重试。"
-    exit 1
+    echo "实例 [$NAME] 已删除，自动创建..."
+    read -p "新实例名称 ($NAME): " new_name
+    NAME="${new_name:-$NAME}"
+    UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
+    sudo python3 -c "import json; json.dump({"nickname":"'$NAME'"}, open('$MCSM_DIR/InstanceConfig/$UUID.json','w'), indent=2)"
+    mkdir -p "$MCSM_DIR/InstanceData/$UUID"
+    echo "✅ 已创建实例: $NAME"
   fi
 }
 
