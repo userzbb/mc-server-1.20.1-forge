@@ -72,6 +72,7 @@ tar -czf "$BACKUP_DIR/backup-${NAME}-$DATE.tar.gz" \
   /home/yuan/minecraft-server/credentials.md \
   /home/yuan/minecraft-server/ddns-go-data 2>/dev/null
 
-find "$BACKUP_DIR" -name "backup-${NAME}-*.tar.gz" -mtime +30 -delete
+# 只保留最近 2 个备份
+ls -t "$BACKUP_DIR"/backup-${NAME}-*.tar.gz 2>/dev/null | tail -n +3 | xargs rm -f 2>/dev/null
 SIZE=$(ls -lh "$BACKUP_DIR/backup-${NAME}-$DATE.tar.gz" | awk '{print $5}')
 echo "✅ 备份完成: backup-${NAME}-$DATE.tar.gz ($SIZE)"
