@@ -109,6 +109,43 @@ do_restore() {
   esac
 }
 
+# 交互选择实例
+select_instance() {
+  local instances=()
+  while IFS= read -r line; do instances+=("$line"); done < <(get_instances)
+  echo "可用实例:"
+  for i in "${!instances[@]}"; do
+    local u=$(echo "${instances[$i]}" | cut -d: -f1)
+    local n=$(echo "${instances[$i]}" | cut -d: -f2)
+    local tag=""; [ -z "$u" ] && tag=" (已删除)"
+    echo "  $((i+1)). $n$tag"
+  done
+  read -p "选择实例 (1-${#instances[@]}): " choice
+  local s="${instances[$((choice-1))]}"
+  UUID=$(echo "$s" | cut -d: -f1)
+  NAME=$(echo "$s" | cut -d: -f2)
+  if [ -z "$UUID" ]; then
+    echo "❌ 实例 [$NAME] 已从面板删除。请先重建同名实例后重试。"
+    exit 1
+  fi
+}
+
+# 交互选择模式
+select_mode() {
+  echo ""
+  echo "恢复模式:"
+  echo "  1. world     — 世界回档"
+  echo "  2. instance  — 重建实例后恢复全部数据"
+  echo "  3. --full    — 完整迁移（含凭据、DDNS）"
+  read -p "选择模式 (1-3): " m
+  case "$m" in
+    1) MODE="world" ;;
+    2) MODE="instance" ;;
+    3) MODE="--full" ;;
+    *) echo "无效选择"; exit 1 ;;
+  esac
+}
+
 # ---- 主流程 ----
 
 # 解析 -y 参数
