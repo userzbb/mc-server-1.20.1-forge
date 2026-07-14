@@ -13,9 +13,7 @@
       "25575:25575/tcp",
       "24454:24454/udp"
     ],
-    "extraVolumes": [
-      "/home/yuan/minecraft-server/mods|/mods|ro"
-    ],
+    "extraVolumes": [],
     "env": [
       "EULA=TRUE",
       "TYPE=FORGE",
