@@ -148,14 +148,6 @@ select_mode() {
 
 # ---- 主流程 ----
 
-# 解析 -y 参数
-SKIP_CONFIRM=false
-ARGS=()
-for arg in "$@"; do
-  [ "$arg" = "-y" ] && SKIP_CONFIRM=true || ARGS+=("$arg")
-done
-set -- "${ARGS[@]}"
-
 if [ $# -eq 0 ]; then
   # 交互模式
   select_instance
@@ -174,7 +166,6 @@ elif [ $# -eq 1 ]; then
   done
   [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
   select_mode
-  [ "$SKIP_CONFIRM" = false ] && read -p "继续? (y/N) " confirm && [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
 
 elif [ $# -ge 2 ]; then
@@ -184,6 +175,5 @@ elif [ $# -ge 2 ]; then
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
   [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
-  [ "$SKIP_CONFIRM" = false ] && read -p "继续? (y/N) " confirm && [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
 fi
