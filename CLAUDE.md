@@ -170,6 +170,7 @@ docker compose restart mcsm-daemon
 ## 备份与恢复
 
 备份脚本自动保留同一实例最近 2 个备份，旧的不占空间。
+恢复脚本自动处理 UUID 迁移和 Docker 配置补全。
 
 ```bash
 # 交互式备份（菜单选择实例）

@@ -159,10 +159,13 @@ docker compose restart mcsm-web
 
 三种恢复模式：
 - **world** — 恢复 `world/` + server.properties（实例配置不动）
-- **instance** — 恢复实例全部数据 + 配置（UUID 变更自动迁移）
+- **instance** — 恢复实例全部数据，UUID 变更自动迁移
 - **--full** — 恢复全部（含凭据、DDNS、节点配置）
 
-恢复时自动找最新备份，会提示先停止实例后执行。
+- 自动找最新备份，提示先停止实例
+- UUID 变更时自动迁移数据目录
+- 备份中缺少实例配置时，自动从 `instance-config.json` 模板补全 Docker 配置  
+- 已删除的实例在列表中标注「已删除」，需先重建再恢复
 
 所有端口集成在 `mc-server` 这个 firewalld 服务里。GUI（`firewall-config`）中需要：
 - **FedoraWorkstation** 区域 → 勾选 `mc-server`
