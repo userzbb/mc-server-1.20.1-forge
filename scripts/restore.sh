@@ -1,14 +1,16 @@
 #!/bin/bash
 # Minecraft 服务器恢复脚本
 # 用法:
-#   ./restore.sh                        # 交互模式（选实例、备份、模式）
+#   ./restore.sh                        # 交互模式（选备份→选实例→选模式）
 #   ./restore.sh forge-1.20.1 instance  # 直接指定
 #   ./restore.sh --list                 # 列出备份
 
 source "$(dirname "$0")/config.sh"
 
+CREATE_SCRIPT="$(dirname "$0")/create_instance.py"
+
 # sudo 密码从 .secrets 读取
-SECRETS_FILE="$(dirname "$0")/../../.secrets"
+SECRETS_FILE="$PROJECT_DIR/.secrets"
 if [ -f "$SECRETS_FILE" ]; then
   SUDO_PASS=$(grep "SUDO_PASS" "$SECRETS_FILE" 2>/dev/null | cut -d= -f2)
 else
@@ -24,8 +26,6 @@ run_sudo() {
   fi
 }
 
-CREATE_SCRIPT="$(dirname "$0")/create_instance.py"
-
 # 列出备份
 if [ "$1" = "--list" ]; then
   echo "可用备份:"
@@ -36,7 +36,7 @@ fi
 # 按名称查找实例 UUID
 get_uuid_by_name() {
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
-    n=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
+    n=$(python3 -c "import json; print(json.load(open('"'"'$f'"'"')).get('"'"'nickname'"'"','"'"''"'"'))" 2>/dev/null)
     u=$(basename "$f" .json)
     [ "$n" = "$1" ] && echo "$u" && return 0
   done
@@ -65,94 +65,7 @@ select_backup() {
   SELECTED_BACKUP="${backups[$((c-1))]}"
 }
 
-# 恢复逻辑
-do_restore() {
-  local name="$1" mode="$2" uuid="$3" backup_file="$4"
-  local old_uuid=$(tar -tzf "$backup_file" | grep "InstanceData/" | head -1 | cut -d/ -f9)
-  local tmpdir=$(mktemp -d)
-
-  echo "========================================"
-  echo "  恢复 [$name] - $(basename "$backup_file")"
-  echo "  模式: $mode"
-  echo "========================================"
-
-  # 场景一：世界回档 - 只恢复世界存档
-  if [ "$mode" = "world" ]; then
-    echo "🔄 恢复世界存档..."
-    tar -xzf "$backup_file" --wildcards "*/world/*" "*/server.properties" "*/eula.txt" -C "$tmpdir" 2>/dev/null
-    # 用 sudo 复制到实例目录
-    [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/world" ] && \
-      sudo cp -r "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/world"/* "$MCSM_DIR/InstanceData/$uuid/world/" 2>/dev/null && \
-      echo "✅ 世界存档已恢复"
-    [ -f "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/server.properties" ] && \
-      sudo cp "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/server.properties" "$MCSM_DIR/InstanceData/$uuid/" && \
-      echo "✅ server.properties 已恢复"
-    [ -f "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/eula.txt" ] && \
-      sudo cp "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/eula.txt" "$MCSM_DIR/InstanceData/$uuid/" && \
-      echo "✅ eula.txt 已恢复"
-    rm -rf "$tmpdir"
-    return
-  fi
-
-  # 场景二/三：完整恢复 - 解压到临时目录再移动
-  echo "🔄 解压备份..."
-  tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
-
-  # 恢复 InstanceData（mod、世界、配置等）
-  backup_instance_dir=""
-  if [ -d "$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceData/$old_uuid" ]; then
-    backup_instance_dir="$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceData/$old_uuid"
-  elif [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid" ]; then
-    backup_instance_dir="$tmpdir/$MCSM_DIR/InstanceData/$old_uuid"
-  fi
-
-  if [ -n "$backup_instance_dir" ]; then
-    echo "🔄 恢复实例数据..."
-    run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
-    run_sudo cp -r "$backup_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null && \
-      echo "✅ 实例数据已恢复（mod、世界、配置）"
-  fi
-
-  # 恢复 InstanceConfig（Docker 配置）
-  backup_config_file=""
-  if [ -f "$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
-    backup_config_file="$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceConfig/$old_uuid.json"
-  elif [ -f "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
-    backup_config_file="$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json"
-  fi
-
-  if [ -n "$backup_config_file" ]; then
-    echo "🔄 恢复实例配置..."
-    run_sudo cp "$backup_config_file" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null && \
-      echo "✅ 实例配置已恢复"
-  else
-    # 备份中没有配置，从模板创建
-    python3 "$CREATE_SCRIPT" "$name" "$uuid" "$MCSM_DIR/InstanceConfig" 2>/dev/null && \
-      echo "✅ 配置已从模板创建"
-  fi
-
-  # 场景三：完整迁移 - 额外恢复节点配置、凭据、DDNS
-  if [ "$mode" = "--full" ]; then
-    echo "🔄 恢复节点/凭据/DDNS..."
-    [ -d "$tmpdir/$MCSM_DIR/../web/data/RemoteServiceConfig" ] && \
-      run_sudo cp -r "$tmpdir/$MCSM_DIR/../web/data/RemoteServiceConfig"/* "$PROJECT_DIR/mcsm/web/data/RemoteServiceConfig/" 2>/dev/null && \
-      echo "✅ 节点配置已恢复"
-    [ -f "$tmpdir/$PROJECT_DIR/credentials.md" ] && \
-      run_sudo cp "$tmpdir/$PROJECT_DIR/credentials.md" "$PROJECT_DIR/" 2>/dev/null && \
-      echo "✅ 凭据已恢复"
-    [ -d "$tmpdir/$PROJECT_DIR/ddns-go-data" ] && \
-      run_sudo cp -r "$tmpdir/$PROJECT_DIR/ddns-go-data"/* "$PROJECT_DIR/ddns-go-data/" 2>/dev/null && \
-      echo "✅ DDNS 已恢复"
-  fi
-
-  # 清理临时目录
-  rm -rf "$tmpdir"
-
-  echo "✅ 恢复完成，重启 daemon..."
-  docker compose restart mcsm-daemon 2>/dev/null
-}
-
-# 自动清理孤儿实例数据
+# 自动清理孤儿实例数据（每次运行时）
 cleanup_orphans() {
   for d in "$MCSM_DIR/InstanceData"/*/; do
     local uuid=$(basename "$d")
@@ -168,17 +81,84 @@ cleanup_orphans() {
 # 运行清理
 cleanup_orphans
 
+# 恢复逻辑
+do_restore() {
+  local name="$1" mode="$2" uuid="$3" backup_file="$4"
+  local tmpdir=$(mktemp -d)
+
+  echo "========================================"
+  echo "  恢复 [$name] - $(basename "$backup_file")"
+  echo "  模式: $mode"
+  echo "========================================"
+
+  # 场景一：世界回档 - 只恢复世界存档
+  if [ "$mode" = "world" ]; then
+    echo "🔄 恢复世界存档..."
+    tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
+    local world_dir=$(find "$tmpdir" -type d -name "world" -path "*/InstanceData/*" 2>/dev/null | head -1)
+    if [ -n "$world_dir" ]; then
+      run_sudo cp -r "$world_dir"/* "$MCSM_DIR/InstanceData/$uuid/world/" 2>/dev/null
+      echo "✅ 世界存档已恢复"
+    fi
+    rm -rf "$tmpdir"
+    return
+  fi
+
+  # 场景二/三：完整恢复
+  echo "🔄 解压备份..."
+  tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
+
+  # 使用 find 动态查找备份中的 InstanceData 目录
+  local backup_instance_dir=$(find "$tmpdir" -type d -name "InstanceData" -path "*/mcsm/*" 2>/dev/null | head -1)
+
+  if [ -n "$backup_instance_dir" ]; then
+    local old_instance_dir=$(find "$backup_instance_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)
+
+    if [ -n "$old_instance_dir" ]; then
+      local old_uuid=$(basename "$old_instance_dir")
+      echo "🔄 恢复实例数据 (旧UUID: $old_uuid → 新UUID: $uuid)..."
+
+      run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
+      run_sudo cp -r "$old_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null &&         echo "✅ 实例数据已恢复（mod、世界、配置）"
+
+      local backup_config="$backup_instance_dir/../InstanceConfig/$old_uuid.json"
+      if [ -f "$backup_config" ]; then
+        run_sudo cp "$backup_config" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
+        run_sudo sed -i "s/$old_uuid/$uuid/g" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
+        echo "✅ 实例配置已更新"
+      else
+        python3 "$CREATE_SCRIPT" "$name" "$uuid" "$MCSM_DIR/InstanceConfig" 2>/dev/null &&           echo "✅ 配置已从模板创建"
+      fi
+    fi
+  else
+    echo "⚠️  备份中无实例数据"
+  fi
+
+  # 场景三：完整迁移
+  if [ "$mode" = "--full" ]; then
+    echo "🔄 恢复节点/凭据/DDNS..."
+    local node_config=$(find "$tmpdir" -type d -name "RemoteServiceConfig" 2>/dev/null | head -1)
+    [ -n "$node_config" ] && run_sudo cp -r "$node_config"/* "$PROJECT_DIR/mcsm/web/data/RemoteServiceConfig/" 2>/dev/null && echo "✅ 节点配置已恢复"
+    local creds=$(find "$tmpdir" -name "credentials.md" 2>/dev/null | head -1)
+    [ -n "$creds" ] && run_sudo cp "$creds" "$PROJECT_DIR/" 2>/dev/null && echo "✅ 凭据已恢复"
+    local ddns=$(find "$tmpdir" -type d -name "ddns-go-data" 2>/dev/null | head -1)
+    [ -n "$ddns" ] && run_sudo cp -r "$ddns"/* "$PROJECT_DIR/ddns-go-data/" 2>/dev/null && echo "✅ DDNS 已恢复"
+  fi
+
+  rm -rf "$tmpdir"
+  echo "✅ 恢复完成，重启 daemon..."
+  docker compose restart mcsm-daemon 2>/dev/null
+}
+
 # === 交互模式 ===
 if [ $# -eq 0 ]; then
-  # 1. 先选备份
   select_backup
   backup_name=$(basename "$SELECTED_BACKUP" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
   echo ""
-  # 2. 选择已有实例或新建
   echo "已有实例:"
   instances=()
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
-    n=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
+    n=$(python3 -c "import json; print(json.load(open('"'"'$f'"'"')).get('"'"'nickname'"'"','"'"''"'"'))" 2>/dev/null)
     [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && instances+=("$n")
   done
   for i in "${!instances[@]}"; do
@@ -193,7 +173,6 @@ if [ $# -eq 0 ]; then
   else
     NAME="${instances[$((choice-1))]}"
   fi
-  # 3. 选模式
   echo ""
   echo "恢复模式:"
   echo "  1. world     — 世界回档"
@@ -211,16 +190,10 @@ if [ $# -eq 0 ]; then
 else
   NAME="$1"; MODE="$2"
   [ -z "$MODE" ] && { echo "请指定: world / instance / --full"; exit 1; }
-
-  # 找备份
   SELECTED_BACKUP=$(ls -t "$BACKUP_DIR/backup-${NAME}-"*.tar.gz 2>/dev/null | head -1)
-  if [ -z "$SELECTED_BACKUP" ]; then
-    echo "未找到 [$NAME] 的备份，可选："
-    select_backup
-  fi
+  [ -z "$SELECTED_BACKUP" ] && { echo "未找到 [$NAME] 的备份"; select_backup; }
 fi
 
-# 查找或创建实例
 UUID=$(get_uuid_by_name "$NAME")
 if [ -z "$UUID" ]; then
   echo "创建实例 [$NAME]..."

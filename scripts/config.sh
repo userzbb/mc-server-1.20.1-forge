@@ -1,11 +1,14 @@
 #!/bin/bash
 # Minecraft 服务器配置文件
 # 所有脚本从这里读取路径配置
-# ⚠️ 迁移时只需修改 .env 文件中的 PROJECT_DIR，此处自动读取
+# 迁移时只需修改 .env 文件中的 PROJECT_DIR，此处自动读取
+
+# 获取脚本所在目录
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # 从 .env 读取项目根目录
-if [ -f "$(dirname "$0")/../.env" ]; then
-  source "$(dirname "$0")/../.env"
+if [ -f "$SCRIPT_DIR/../../.env" ]; then
+  source "$SCRIPT_DIR/../../.env"
 fi
 PROJECT_DIR="${PROJECT_DIR:-/home/yuan/minecraft-server}"
 
@@ -32,3 +35,7 @@ CREDENTIALS_FILE="$PROJECT_DIR/credentials.md"
 
 # 实例配置模板
 INSTANCE_TEMPLATE="$PROJECT_DIR/instance-config.json"
+
+# 导出所有变量
+export PROJECT_DIR MCSM_DIR BACKUP_DIR INSTANCE_CONFIG_DIR INSTANCE_DATA_DIR
+export REMOTE_CONFIG_DIR DDNS_DATA_DIR CREDENTIALS_FILE INSTANCE_TEMPLATE
