@@ -1,37 +1,100 @@
 # 📦 TACZcraft 实例 Mod 清单
 
 > **实例：** tacz-craft
-> **Mod 数量：** 95
+> **Mod 数量：** 93
 
-| 文件名 | 说明 |
-|--------|------|
-| alexscaves-2.0.2 | 亚历山大洞穴 |
-| alexsdelight-1.5 | 亚历克斯食物 |
-| alexsmobs-1.22.9 | 亚历克斯生物 |
-| alltheleaks-0.1.4-beta | 性能优化 |
-| AoA3-3.7.1 | 虚无世界 3 |
-| appleskin-2.5.1 | 饱食度显示 |
-| appliedenergistics2-15.4.2 | AE2 应用能源 |
-| architectury-9.2.14 | API 桥梁 |
-| balm-7.3.31 | 跨平台库 |
-| BiomesOPlenty-18.0.0 | 更多生物群系 |
-| Bookshelf-20.2.13 | 开发库 |
-| BrandonsCore-3.2.1 | 龙之研究核心 |
-| citadel-2.6.1 | 库（Alex 前置） |
-| CodeChickenLib-4.4.0 | 代码鸡库 |
-| Controlling-12.0.2 | 按键控制 |
-| create-6.0.4 | 机械动力 |
-| create_misc_and_things_4.0A | 机械动力附属 |
-| createtaczauto-1.3.7 | 机械动力 × TACZ 联动 |
-| CreativeCore-2.12.32 | 创意核心 |
-| curios-5.14.1 | 饰品栏 |
-| CustomNPCs-1.20.1 | 自定义 NPC |
-| Draconic-Evolution-3.1.2 | 龙之研究 |
-| embeddium-0.3.31 | 渲染优化 |
-| EnderIO-6.2.11-beta | 末影接口 |
-| Endless Ammo Lib v1.1 | 无限弹药库 |
-| ends_delight-2.5.1 | 末地乐事 |
-| Evolved Mekanism-1.1-beta | 进阶通用机械 |
-| FarmersDelight-1.2.7 | 农夫乐事 |
-| ferritecore-6.0.1 | 内存优化 |
-| … 及更多 | |
+| Mod | 版本 |
+|-----|------|
+| alexscaves | 2.0.2 |
+| alexsdelight | 1.5 |
+| alexsmobs | 1.22.9 |
+| alltheleaks | 0.1.4-beta+1.20.1-forge |
+| AoA3 | 1.20.1-3.7.1-all |
+| appleskin-forge-mc1.20.1 | forge-mc1.20.1-2.5.1 |
+| appliedenergistics2-forge | forge-15.4.2 |
+| architectury | 9.2.14-forge |
+| balm-forge | forge-1.20.1-7.3.31-all |
+| BiomesOPlenty | 1.20.1-18.0.0.592 |
+| Bookshelf-Forge | Forge-1.20.1-20.2.13 |
+| BrandonsCore | 1.20.1-3.2.1.302-universal |
+| citadel | 2.6.1-1.20.1 |
+| CodeChickenLib | 1.20.1-4.4.0.516-universal |
+| Controlling-forge | forge-1.20.1-12.0.2 |
+| create | 1.20.1-6.0.8 |
+| create_misc_and_things_ 1.20.1_4.0A |  |
+| createtaczauto | 1.3.7-forge-1.20.1 |
+| CreativeCore_FORGE_v2.12.32_mc1.20.1 |  |
+| curios-forge | forge-5.14.1+1.20.1 |
+| CustomNPCs | 1.20.1-GBPort-Unofficial-20240824 |
+| Draconic-Evolution | Evolution-1.20.1-3.1.2.604-universal |
+| embeddium | 0.3.31+mc1.20.1 |
+| EnderIO | 1.20.1-6.2.11-beta-all |
+| Endless Ammo Lib v1.1 |  |
+| ends_delight | 2.5.1+forge.1.20.1 |
+| Evolved Mekanism | 1.20.1-1.1-beta-fix1 |
+| FarmersDelight | 1.20.1-1.2.7 |
+| ferritecore | 6.0.1-forge |
+| ftb-library-forge | library-forge-2001.2.9 |
+| ftb-ultimine-forge | ultimine-forge-2001.1.5 |
+| geckolib-forge | forge-1.20.1-4.7.1.2 |
+| guccivuitton | 1.20.1-0.2.2 |
+| guideme | 20.1.7 |
+| gundurability | 1.8.1-all |
+| iceandfire | 2.1.13-1.20.1-beta-5 |
+| igleelib | 1.20.1-1.2.5 |
+| InventoryProfilesNext-forge | forge-1.20-1.10.14 |
+| ironchest | 1.20.1-14.4.4 |
+| Jade | 1.20.1-Forge-11.13.2 |
+| JadeAddons | 1.20.1-Forge-5.5.1 |
+| jei | 1.20.1-forge-15.20.0.106 |
+| jsconf | 1.1.1 |
+| JustEnoughProfessions-forge | forge-1.20.1-3.0.1 |
+| kaleidoscopecookery | 1.4.1-forge+mc1.20.1 |
+| kotlinforforge | 4.11.0-all |
+| kubejs-forge | forge-2001.6.5-build.16 |
+| L_Enders_Cataclysm 1.20.1 | 2.66 |
+| libIPN-forge | forge-1.20-4.0.2 |
+| lionfishapi | 2.4-Fix |
+| LittleTiles_BETA_v1.6.0-pre159_mc1.20.1 | pre159_mc1.20.1 |
+| maid_restaurant | 0.2.8 |
+| Mantle | 1.20.1-1.11.44 |
+| Mekanism | 1.20.1-10.4.16.80 |
+| MekanismAdditions | 1.20.1-10.4.16.80 |
+| MekanismGenerators | 1.20.1-10.4.16.80 |
+| MekanismTools | 1.20.1-10.4.16.80 |
+| MekanismWeapons | 1.20.1-2.5 |
+| modernfix-forge | forge-5.23.0+mc1.20.1 |
+| MouseTweaks-forge-mc1.20.1 | forge-mc1.20.1-2.25.1 |
+| nethersdelight | 1.20.1-4.0 |
+| notenoughcrashes | 4.4.7+1.20.1-forge |
+| packetfixer-forge | forge-2.0.0-1.19-to-1.20.1 |
+| ProjectE | 1.20.1-PE1.0.1 |
+| Quark | 4.0-462 |
+| quark_delight_1.0.0_forge_1.20.1 |  |
+| rhino-forge | forge-2001.2.3-build.10 |
+| Searchables-forge | forge-1.20.1-1.0.3 |
+| ShoulderSurfing-Forge | Forge-1.20.1-4.12.0 |
+| SJAP_Resharpened | 1.20.1-1.1.10 |
+| SlashBlade | 1.20.1-0.1.2 |
+| SlashBladeResharped | 1.20.1-1.2.32 |
+| SlashBlade-Skin | Skin-1.20.1-1.0.0 |
+| slashblade_useful_addon | 1.0.7 |
+| SmartBrainLib-forge | forge-1.20.1-1.15 |
+| sophisticatedcore | 1.20.1-1.2.69.1005 |
+| sridr | 1.0 |
+| tacz | 1.20.1-1.1.5-all |
+| taczaddon | 1.20.1-1.1.5-for1.1.5 |
+| tacz_c | 1.0.1-forge-1.20.1 |
+| taczjs-forge | forge-1.3.5-mc1.20.1 |
+| tacz_npc | 1.2.0 |
+| tacz-tweaks | tweaks-2.5.0-all |
+| TConstruct | 1.20.1-3.9.2.37 |
+| TerraBlender-forge | forge-1.20.1-3.0.1.10 |
+| tlmforae | 1.2 |
+| touhoulittlemaid | 1.5.3-forge+mc1.20.1 |
+| twilightforest | 1.20.1-4.3.2508-universal |
+| waystones-forge | forge-1.20.1-14.1.13 |
+| Xaeros_Minimap_25.2.6_Forge_1.20 |  |
+| yet_another_config_lib_v3 | 3.6.6+1.20.1-forge |
+| ysm | 2.6.5-forge+mc1.20.1-release |
+| Zeta | 1.0-30 |
