@@ -111,7 +111,7 @@ docker compose restart mcsm-web
 85 个 Mod，清单见 **[instances/forge-1.20.1/mod-list.md](instances/forge-1.20.1/mod-list.md)**。
 
 ### tacz-craft 实例
-88 个 Mod，清单见 **[instances/tacz-craft/mod-list.md](instances/tacz-craft/mod-list.md)**。
+80 个 Mod，清单见 **[instances/tacz-craft/mod-list.md](instances/tacz-craft/mod-list.md)**。
 
 ### 不能装到服务器的客户端 Mod
 

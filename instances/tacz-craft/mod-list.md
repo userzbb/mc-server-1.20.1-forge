@@ -1,14 +1,13 @@
 # 📦 TACZcraft 实例 Mod 清单
-
-> **Mod 数量：** 88
+> **Mod 数量：** 80
 
 | Mod | 版本 |
 |-----|------|
 | alexscaves | 2.0.2 |
 | alexsdelight | 1.5 |
 | alexsmobs | 1.22.9 |
+| alltheleaks | 0.1.4-beta+1.20.1-forge |
 | AoA3 | 1.20.1-3.7.1-all |
-| appleskin-forge-mc1.20.1 | forge-mc1.20.1-2.5.1 |
 | appliedenergistics2-forge | forge-15.4.2 |
 | architectury | 9.2.14-forge |
 | balm-forge | forge-1.20.1-7.3.31-all |
@@ -17,7 +16,6 @@
 | BrandonsCore | 1.20.1-3.2.1.302-universal |
 | citadel | 2.6.1-1.20.1 |
 | CodeChickenLib | 1.20.1-4.4.0.516-universal |
-| Controlling-forge | forge-1.20.1-12.0.2 |
 | create | 1.20.1-6.0.8 |
 | create_misc_and_things_ 1.20.1_4.0A |  |
 | createtaczauto | 1.3.7-forge-1.20.1 |
@@ -40,18 +38,13 @@
 | gundurability | 1.8.1-all |
 | iceandfire | 2.1.13-1.20.1-beta-5 |
 | igleelib | 1.20.1-1.2.5 |
-| InventoryProfilesNext-forge | forge-1.20-1.10.14 |
 | ironchest | 1.20.1-14.4.4 |
-| Jade | 1.20.1-Forge-11.13.2 |
-| JadeAddons | 1.20.1-Forge-5.5.1 |
-| jei | 1.20.1-forge-15.20.0.106 |
 | jsconf | 1.1.1 |
 | JustEnoughProfessions-forge | forge-1.20.1-3.0.1 |
 | kaleidoscopecookery | 1.4.1-forge+mc1.20.1 |
 | kotlinforforge | 4.11.0-all |
 | kubejs-forge | forge-2001.6.5-build.16 |
 | L_Enders_Cataclysm 1.20.1 | 2.66 |
-| libIPN-forge | forge-1.20-4.0.2 |
 | lionfishapi | 2.4-Fix |
 | maid_restaurant | 0.2.8 |
 | Mantle | 1.20.1-1.11.44 |
@@ -60,14 +53,13 @@
 | MekanismGenerators | 1.20.1-10.4.16.80 |
 | MekanismTools | 1.20.1-10.4.16.80 |
 | MekanismWeapons | 1.20.1-2.5 |
-| modernfix-forge | forge-5.27.58+mc1.20.1 |
-| MouseTweaks-forge-mc1.20.1 | forge-mc1.20.1-2.25.1 |
+| modernfix-forge | forge-5.23.0+mc1.20.1 |
 | nethersdelight | 1.20.1-4.0 |
+| packetfixer-forge | forge-2.0.0-1.19-to-1.20.1 |
 | ProjectE | 1.20.1-PE1.0.1 |
 | Quark | 4.0-462 |
 | quark_delight_1.0.0_forge_1.20.1 |  |
 | rhino-forge | forge-2001.2.3-build.10 |
-| Searchables-forge | forge-1.20.1-1.0.3 |
 | SJAP_Resharpened | 1.20.1-1.1.10 |
 | SlashBlade | 1.20.1-0.1.2 |
 | SlashBladeResharped | 1.20.1-1.2.32 |
@@ -88,7 +80,6 @@
 | touhoulittlemaid | 1.5.3-forge+mc1.20.1 |
 | twilightforest | 1.20.1-4.3.2508-universal |
 | waystones-forge | forge-1.20.1-14.1.13 |
-| Xaeros_Minimap_25.2.6_Forge_1.20 |  |
 | yet_another_config_lib_v3 | 3.6.6+1.20.1-forge |
 | ysm | 2.6.5-forge+mc1.20.1-release |
 | Zeta | 1.0-30 |
