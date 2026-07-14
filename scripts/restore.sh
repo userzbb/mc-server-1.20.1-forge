@@ -66,7 +66,19 @@ do_restore() {
   local name="$1" mode="$2" uuid="$3"
   local backup_file=$(ls -t "$BACKUP_DIR/backup-${name}-"*.tar.gz 2>/dev/null | head -1)
 
-  [ -z "$backup_file" ] && echo "❌ 未找到 $name 的备份" && exit 1
+  if [ -z "$backup_file" ]; then
+    echo "❌ 未找到 $name 的备份。可选备份:"
+    local backups=()
+    for f in "$BACKUP_DIR"/backup-*.tar.gz; do
+      [ -f "$f" ] && backups+=("$f")
+    done
+    for i in "${!backups[@]}"; do
+      echo "  $((i+1)). $(basename "${backups[$i]}")"
+    done
+    read -p "选择备份 (1-${#backups[@]}): " c
+    backup_file="${backups[$((c-1))]}"
+    [ -z "$backup_file" ] && echo "无效选择" && exit 1
+  fi
 
   echo -e "${GREEN}========================================${NC}"
   echo -e "${GREEN}  恢复 [$name] - $(basename "$backup_file")${NC}"
