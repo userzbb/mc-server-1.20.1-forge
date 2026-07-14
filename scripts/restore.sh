@@ -164,25 +164,39 @@ elif [ $# -eq 1 ]; then
     n=$(echo "$inst" | cut -d: -f2)
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
-  [ -z "$UUID" ] && echo "ℹ️  实例 [$NAME] 不存在，将自动创建"
-  read -p "新实例名称 ($NAME): " new_name
-  NAME="${new_name:-$NAME}"
   if [ -z "$UUID" ]; then
-    echo "实例 [$NAME] 不存在。选择:"
-    echo ""
-    read -p "新实例名称 ($NAME): " new_name
-    NAME="${new_name:-$NAME}"
-    echo "  1. 我去面板创建，再来恢复"
+    echo "实例 [$NAME] 不存在。请选择:"
+    echo "  1. 我去面板创建同名实例，再来恢复"
     echo "  2. 自动创建配置文件，直接恢复"
     read -p "选择 (1-2): " c
-    if [ "$c" = "2" ]; then
-      UUID=$(python3 scripts/auto_create.py "$NAME" "$MCSM_DIR/InstanceConfig")
-      [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
-      mkdir -p "$MCSM_DIR/InstanceData/$UUID"
-      echo "✅ 配置文件已创建"
-    else
-      exit 0
-    fi
+    case "$c" in
+      2)
+        UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
+        read -p "新实例名称 ($NAME): " new_name
+        NAME="${new_name:-$NAME}"
+        sudo python3 -c "
+import json
+cfg_path = '$MCSM_DIR/InstanceConfig/$UUID.json'
+with open(cfg_path, 'w') as f:
+    json.dump({
+        'nickname': '$NAME',
+        'startCommand': '',
+        'stopCommand': '^c',
+        'cwd': '',
+        'ie': 'utf-8',
+        'oe': 'utf-8',
+        'createDatetime': 0,
+        'lastDatetime': 0,
+        'processType': 'general',
+        'type': 'universal',
+        'docker': {}
+    }, f, indent=2)
+"
+        mkdir -p "$MCSM_DIR/InstanceData/$UUID"
+        echo "✅ 配置文件已创建"
+        ;;
+      *) exit 0 ;;
+    esac
   fi
   select_mode
   read -p "继续? (y/N) " confirm; [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
@@ -194,13 +208,11 @@ elif [ $# -ge 2 ]; then
     n=$(echo "$inst" | cut -d: -f2)
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
-  [ -z "$UUID" ] && echo "ℹ️  实例 [$NAME] 不存在，将自动创建"
   read -p "新实例名称 ($NAME): " new_name
   NAME="${new_name:-$NAME}"
   if [ -z "$UUID" ]; then
     echo "实例 [$NAME] 不存在，自动创建配置..."
-    UUID=$(python3 scripts/auto_create.py "$NAME" "$MCSM_DIR/InstanceConfig")
-    [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
+    UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)") && sudo python3 -c "import json; cfg_path='/$MCSM_DIR/InstanceConfig/$UUID.json'; json.dump({"nickname":"'$NAME'", "startCommand":"","stopCommand":"^c","cwd":"","ie":"utf-8","oe":"utf-8","createDatetime":0,"lastDatetime":0,"processType":"general","type":"universal","docker":{}}, open(cfg_path,"w"),indent=2)"
     mkdir -p "$MCSM_DIR/InstanceData/$UUID"
     echo "✅ 配置已创建"
   fi
