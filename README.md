@@ -129,7 +129,21 @@ docker compose restart mcsm-web
 | `entity_model_features` | 实体模型，纯客户端 |
 | `appleskin` | 饱食度 HUD，纯客户端 |
 
-## 🔧 防火墙
+## 💾 备份
+
+```bash
+# 一键备份（forge 实例）
+./backup.sh
+
+# 备份 tacz 实例
+./backup.sh 71dedd089a9c4affaa3c811a8e722be8
+
+# 定时备份（每天凌晨 4 点）
+crontab -e
+# 添加: 0 4 * * * /home/yuan/minecraft-server/backup.sh
+```
+
+备份文件在 `backups/` 目录，保留 30 天自动清理。
 
 所有端口集成在 `mc-server` 这个 firewalld 服务里。GUI（`firewall-config`）中需要：
 - **FedoraWorkstation** 区域 → 勾选 `mc-server`

@@ -1,92 +1,97 @@
 # 📦 forge-1.20.1 Mod 清单
 
-> **服务器版本：** Forge 1.20.1 (47.4.21)
-> **Mod 数量：** 85
+> **Mod 数量：** 91
 
-| Mod | 版本 |
-|-----|------|
-| 1.20.1-maid_useful_task | maid_useful_task-1.4.2 |
-| ae2wtlib | 15.3.3-forge |
-| AEInfinityBooster | 1.20.1-1.0.0+51 |
-| appleskin-forge-mc1.20.1 | forge-mc1.20.1-2.5.1 |
-| appliedenergistics2-forge | forge-15.4.10 |
-| Applied-Mekanistics | Mekanistics-1.4.3 |
-| architectury | 9.2.14-forge |
-| ars_nouveau | 1.20.1-4.12.7-all |
-| athena-forge | forge-1.20.1-3.1.2 |
-| balm-forge | forge-1.20.1-7.3.41-all |
-| bendy-lib-forge | lib-forge-4.0.0 |
-| Bookshelf-Forge | Forge-1.20.1-20.2.15 |
-| cataclysm_dimension-forge1.20.1 | forge1.20.1-1.6.2 |
-| chipped-forge | forge-1.20.1-3.0.7 |
-| chloride-FORGE-mc1.20.1-v1.7.7 | FORGE-mc1.20.1-v1.7.7 |
-| cloth-config | config-11.1.136-forge |
-| Controlling-forge | forge-1.20.1-12.0.2 |
-| craftingtweaks-forge | forge-1.20.1-18.2.9 |
-| CreativeCore_FORGE_v2.12.39_mc1.20.1 |  |
-| curios_for_ammo_box | 1.20.1-1.2.0 |
-| curios-forge | forge-5.14.1+1.20.1 |
-| duplicationless | 1.20.1-1.2.0 |
-| embeddium | 0.3.31+mc1.20.1 |
-| emi | 1.1.24+1.20.1+forge |
-| EnchantmentDescriptions-Forge | Forge-1.20.1-17.1.21 |
-| energyblade | 1.1.5-1.20.1 |
-| entityculling-forge | forge-1.10.5-mc1.20.1 |
-| entity_model_features | 3.2.4-1.20.1-forge |
-| ExtendedAE | 1.20-1.4.17-forge |
-| ExtraDisks | 1.20.1-3.0.3 |
-| FarmersDelight | 1.20.1-1.3.2 |
-| ferritecore | 6.0.1-forge |
-| flerovium-forge | forge-1.20.1-1.2.19-all |
-| FluxNetworks | 1.20.1-7.2.1.15 |
-| ftb-library-forge | library-forge-2001.2.13 |
-| Glodium | 1.20-1.5-forge |
-| guideme | 20.1.15 |
-| Jade | 1.20.1-Forge-11.13.2 |
-| jei | 1.20.1-forge-15.20.0.134 |
-| kaleidoscopecookery | 1.4.1-forge+mc1.20.1 |
-| kotlinforforge | 4.12.0-all |
-| kubejs-forge | forge-2001.6.5-build.26 |
-| L_Enders_Cataclysm | 3.31 |
-| lionfishapi | 3.0 |
-| lradd | 1.20.1-0.3.0 |
-| Maid Attributes | 1.20.1-1.0.0 |
-| maid_restaurant | 0.2.8 |
-| megacells-forge | forge-2.4.6-1.20.1 |
-| Mekanism | 1.20.1-10.4.16.80 |
-| modernfix-forge | forge-5.27.58+mc1.20.1 |
-| mrqxs_Slashblade_Core | 1.20.1-1.4.1 |
-| open-parties-and-claims-forge | parties-and-claims-forge-1.20.1-0.27.6 |
-| Patchouli | 1.20.1-85-FORGE |
-| player-animation-lib-forge | animation-lib-forge-1.0.2-rc1+1.20 |
-| PlayerRevive_FORGE_v2.0.31_mc1.20.1 |  |
-| refined_ammo_box | 0.2.1 |
-| refinedstorage | 1.12.4 |
-| resharped_renderfix_patch | 1.0.1 |
-| resourcefullib-forge | forge-1.20.1-2.1.29 |
-| rhino-forge | forge-2001.2.3-build.10 |
-| rsrequestify | 1.20.1-2.3.3 |
-| Searchables-forge | forge-1.20.1-1.0.3 |
-| SJAP_Resharpened | 1.20.1-1.2.16 |
-| SlashBladeResharped | 1.20.1-1.9.65 |
-| sodiumdynamiclights-forge | forge-1.0.10-1.20.1 |
-| sodiumoptionsapi-forge | forge-1.0.10-1.20.1 |
-| sodiumoptionsmodcompat-forge | forge-1.0.0-1.20.1 |
-| sophisticatedbackpacks | 1.20.1-3.24.59.1960 |
-| sophisticatedcore | 1.20.1-1.3.66.2138 |
-| sophisticated_jei_index | 1.1.0-forge-1.20.1 |
-| sound-physics-remastered-forge | physics-remastered-forge-1.20.1-1.5.1 |
-| System Volume Information |  |
-| tacz | 1.20.1-1.1.8-hotfix |
-| taczaddon | 1.1.8-hotfix3-for-new-soph |
-| tacz-tweaks | tweaks-2.14.2-all |
-| tlmforae | 1.2 |
-| touhoulittlemaid | 1.5.3-forge+mc1.20.1 |
-| touhou_little_maid_spell | 1.8.0.2-beta2-forge+mc1.20.1-all |
-| trashslot-forge | forge-1.20.1-15.1.5 |
-| twilightforest | 1.20.1-4.3.2508-universal |
-| voicechat-forge | forge-1.20.1-2.6.20 |
-| xaerominimap-forge | forge-1.20.1-26.2.0 |
-| xaeroworldmap-forge | forge-1.20.1-1.42.0 |
-| Yakumoblade | 1.1.4-1.20.1_Forge |
-| yet_another_config_lib_v3 | 3.6.6+1.20.1-forge |
+| 文件名 |
+|--------|
+| 1.20.1-maid_useful_task-1.4.2.jar |
+| ae2wtlib-15.3.3-forge.jar |
+| AEInfinityBooster-1.20.1-1.0.0+51.jar |
+| appleskin-forge-mc1.20.1-2.5.1.jar |
+| appliedenergistics2-forge-15.4.10.jar |
+| Applied-Mekanistics-1.4.3.jar |
+| architectury-9.2.14-forge.jar |
+| ars_nouveau-1.20.1-4.12.7-all.jar |
+| athena-forge-1.20.1-3.1.2.jar |
+| balm-forge-1.20.1-7.3.41-all.jar |
+| bendy-lib-forge-4.0.0.jar |
+| Bookshelf-Forge-1.20.1-20.2.15.jar |
+| cataclysm_dimension-forge1.20.1-1.6.2.jar |
+| chipped-forge-1.20.1-3.0.7.jar |
+| chloride-FORGE-mc1.20.1-v1.7.7.jar |
+| cloth-config-11.1.136-forge.jar |
+| Controlling-forge-1.20.1-12.0.2.jar |
+| craftingtweaks-forge-1.20.1-18.2.9.jar |
+| CreativeCore_FORGE_v2.12.39_mc1.20.1.jar |
+| curios_for_ammo_box-1.20.1-1.2.0.jar |
+| curios-forge-5.14.1+1.20.1.jar |
+| duplicationless-1.20.1-1.2.0.jar |
+| easy-villagers-forge-1.20.1-1.1.39.jar |
+| embeddium-0.3.31+mc1.20.1.jar |
+| emi-1.1.24+1.20.1+forge.jar |
+| EnchantmentDescriptions-Forge-1.20.1-17.1.21.jar |
+| energyblade-1.1.5-1.20.1.jar |
+| entityculling-forge-1.10.5-mc1.20.1.jar |
+| entity_model_features-3.2.4-1.20.1-forge.jar |
+| ExtendedAE-1.20-1.4.17-forge.jar |
+| ExtraDisks-1.20.1-3.0.3.jar |
+| FarmersDelight-1.20.1-1.3.2.jar |
+| ferritecore-6.0.1-forge.jar |
+| flerovium-forge-1.20.1-1.2.19-all.jar |
+| FluxNetworks-1.20.1-7.2.1.15.jar |
+| ftb-library-forge-2001.2.13.jar |
+| ftb-ultimine-forge-2001.1.8.jar |
+| Glodium-1.20-1.5-forge.jar |
+| guideme-20.1.15.jar |
+| InventoryProfilesNext-forge-1.20-1.10.20.jar |
+| Jade-1.20.1-Forge-11.13.2.jar |
+| jei-1.20.1-forge-15.20.0.134.jar |
+| kaleidoscopecookery-1.4.1-forge+mc1.20.1.jar |
+| kotlinforforge-4.12.0-all.jar |
+| kubejs-forge-2001.6.5-build.26.jar |
+| L_Enders_Cataclysm-3.31.jar |
+| libIPN-forge-1.20-4.0.2.jar |
+| lionfishapi-3.0.jar |
+| lradd-1.20.1-0.3.0.jar |
+| Maid Attributes-1.20.1-1.0.0.jar |
+| maid_restaurant-0.2.8.jar |
+| megacells-forge-2.4.6-1.20.1.jar |
+| Mekanism-1.20.1-10.4.16.80.jar |
+| modernfix-forge-5.27.58+mc1.20.1.jar |
+| mrqxs_Slashblade_Core-1.20.1-1.4.1.jar |
+| open-parties-and-claims-forge-1.20.1-0.27.6.jar |
+| Patchouli-1.20.1-85-FORGE.jar |
+| player-animation-lib-forge-1.0.2-rc1+1.20.jar |
+| PlayerRevive_FORGE_v2.0.31_mc1.20.1.jar |
+| refined_ammo_box-0.2.1.jar |
+| refinedstorage-1.12.4.jar |
+| resharped_renderfix_patch-1.0.1.jar |
+| resourcefullib-forge-1.20.1-2.1.29.jar |
+| rhino-forge-2001.2.3-build.10.jar |
+| rsrequestify-1.20.1-2.3.3.jar |
+| Searchables-forge-1.20.1-1.0.3.jar |
+| SJAP_Resharpened-1.20.1-1.2.16.jar |
+| SlashBladeResharped-1.20.1-1.9.65.jar |
+| sodiumdynamiclights-forge-1.0.10-1.20.1.jar |
+| sodiumoptionsapi-forge-1.0.10-1.20.1.jar |
+| sodiumoptionsmodcompat-forge-1.0.0-1.20.1.jar |
+| sophisticatedbackpacks-1.20.1-3.24.59.1960.jar |
+| sophisticatedcore-1.20.1-1.3.66.2138.jar |
+| sophisticated_jei_index-1.1.0-forge-1.20.1.jar |
+| sound-physics-remastered-forge-1.20.1-1.5.1.jar |
+| System Volume Information |
+| tacz-1.20.1-1.1.8-hotfix.jar |
+| taczaddon-1.1.8-hotfix3-for-new-soph.jar |
+| tacz-tweaks-2.14.2-all.jar |
+| tlmforae-1.2.jar |
+| toms_storage-1.20-1.7.1.jar |
+| touhoulittlemaid-1.5.3-forge+mc1.20.1.jar |
+| touhou_little_maid_spell-1.8.0.2-beta2-forge+mc1.20.1-all.jar |
+| trashslot-forge-1.20.1-15.1.5.jar |
+| twilightforest-1.20.1-4.3.2508-universal.jar |
+| voicechat-forge-1.20.1-2.6.20.jar |
+| xaerominimap-forge-1.20.1-26.2.0.jar |
+| xaeroworldmap-forge-1.20.1-1.42.0.jar |
+| Yakumoblade-1.1.4-1.20.1_Forge.jar |
+| yet_another_config_lib_v3-3.6.6+1.20.1-forge.jar |
+| ysm-2.6.5-forge+mc1.20.1-release.jar |

@@ -25,7 +25,7 @@ Minecraft 服务器通过 MCSManager 面板创建 Docker 实例，不直接由 d
 | `credentials.md` | 所有密码和密钥 | ❌ gitignore |
 | `instance-config.json` | Docker 实例配置模板 | ✅ |
 | `server.properties.template` | 服务端配置模板 | ✅ |
-| `instances/forge-1.20.1/mod-list.md` | forge 实例 Mod 清单（84 个） | ✅ |
+| `instances/forge-1.20.1/mod-list.md` | forge 实例 Mod 清单（91 个） | ✅ |
 | `instances/tacz-craft/mod-list.md` | tacz 实例 Mod 清单（85 个） | ✅ |
 | `mods/*.jar` | Mod 二进制文件 | ❌ gitignore |
 | `mcsm/` | MCSManager 运行时数据（含实例数据） | ❌ gitignore |
