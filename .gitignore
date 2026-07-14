@@ -20,3 +20,6 @@ claude-resume
 temp-mods/
 home/
 
+
+# 敏感数据
+.secrets

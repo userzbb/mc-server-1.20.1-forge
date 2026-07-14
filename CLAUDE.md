@@ -163,9 +163,16 @@ sudo chown 1000:1000 mcsm/daemon/data/InstanceData/<UUID>/eula.txt
 docker compose restart mcsm-daemon
 ```
 
-## 凭据管理
+## 文件结构
 
-所有密码和密钥在 `credentials.md`（已 gitignore），不要硬编码到任何跟踪的文件中。
+| 文件 | 内容 | Git |
+|------|------|-----|
+| `.env` | 路径配置（PROJECT_DIR） | ✅ 跟踪 |
+| `.secrets` | 敏感数据（密码、密钥） | ❌ gitignore |
+| `credentials.md` | 凭据说明文档 | ❌ gitignore |
+| `instance-config.json` | Docker 实例配置模板 | ✅ 跟踪 |
+
+**凭据管理：** 所有密码在 `.secrets`，不要硬编码到代码中。
 
 ## 配置管理
 

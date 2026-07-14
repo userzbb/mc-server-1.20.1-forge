@@ -7,9 +7,13 @@
 
 source "$(dirname "$0")/config.sh"
 
-# sudo 密码从 credentials.md 读取
-CREDENTIALS_FILE="$(dirname "$0")/../../credentials.md"
-SUDO_PASS=$(grep -A1 "sudo" "$CREDENTIALS_FILE" 2>/dev/null | tail -1 | awk -F'|' '{print $3}' | tr -d ' ')
+# sudo 密码从 .secrets 读取
+SECRETS_FILE="$(dirname "$0")/../../.secrets"
+if [ -f "$SECRETS_FILE" ]; then
+  SUDO_PASS=$(grep "SUDO_PASS" "$SECRETS_FILE" 2>/dev/null | cut -d= -f2)
+else
+  SUDO_PASS=""
+fi
 
 # 带 sudo 的命令（自动输入密码）
 run_sudo() {
