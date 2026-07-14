@@ -139,6 +139,7 @@ docker compose restart mcsm-web
 
 ```bash
 ./scripts/backup.sh                    # 交互菜单选择实例
+./scripts/backup.sh --list             # 列出可备份的实例
 ./scripts/backup.sh forge-1.20.1       # 直接备份指定实例
 ```
 
