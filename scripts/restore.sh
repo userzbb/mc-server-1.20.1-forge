@@ -7,6 +7,19 @@
 
 source "$(dirname "$0")/config.sh"
 
+# sudo 密码从 credentials.md 读取
+CREDENTIALS_FILE="$(dirname "$0")/../../credentials.md"
+SUDO_PASS=$(grep -A1 "sudo" "$CREDENTIALS_FILE" 2>/dev/null | tail -1 | awk -F'|' '{print $3}' | tr -d ' ')
+
+# 带 sudo 的命令（自动输入密码）
+run_sudo() {
+  if [ -n "$SUDO_PASS" ]; then
+    echo "$SUDO_PASS" | sudo -S "$@" 2>/dev/null
+  else
+    sudo "$@"
+  fi
+}
+
 CREATE_SCRIPT="$(dirname "$0")/create_instance.py"
 
 # 列出备份
@@ -52,43 +65,72 @@ select_backup() {
 do_restore() {
   local name="$1" mode="$2" uuid="$3" backup_file="$4"
   local old_uuid=$(tar -tzf "$backup_file" | grep "InstanceData/" | head -1 | cut -d/ -f9)
+  local tmpdir=$(mktemp -d)
 
   echo "========================================"
   echo "  恢复 [$name] - $(basename "$backup_file")"
   echo "  模式: $mode"
   echo "========================================"
 
+  # 场景一：世界回档 - 只恢复世界存档
   if [ "$mode" = "world" ]; then
-    tar -xzf "$backup_file" --wildcards "*/world/*" "*/server.properties" "*/eula.txt" -C / 2>/dev/null
-    echo "✅ 世界已恢复"
+    echo "🔄 恢复世界存档..."
+    tar -xzf "$backup_file" --wildcards "*/world/*" "*/server.properties" "*/eula.txt" -C "$tmpdir" 2>/dev/null
+    # 用 sudo 复制到实例目录
+    [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/world" ] && \
+      sudo cp -r "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/world"/* "$MCSM_DIR/InstanceData/$uuid/world/" 2>/dev/null && \
+      echo "✅ 世界存档已恢复"
+    [ -f "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/server.properties" ] && \
+      sudo cp "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/server.properties" "$MCSM_DIR/InstanceData/$uuid/" && \
+      echo "✅ server.properties 已恢复"
+    [ -f "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/eula.txt" ] && \
+      sudo cp "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid/eula.txt" "$MCSM_DIR/InstanceData/$uuid/" && \
+      echo "✅ eula.txt 已恢复"
+    rm -rf "$tmpdir"
     return
   fi
 
-  # instance / --full
-  tar -xzf "$backup_file" -C / 2>/dev/null
+  # 场景二/三：完整恢复 - 解压到临时目录再移动
+  echo "🔄 解压备份..."
+  tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
 
-  # UUID 迁移
-  if [ -n "$old_uuid" ] && [ "$old_uuid" != "$uuid" ]; then
-    echo "ℹ️  UUID 变更 ($old_uuid → $uuid)"
-    [ -d "$MCSM_DIR/InstanceData/$old_uuid" ] && mv "$MCSM_DIR/InstanceData/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$old_uuid"
+  # 恢复 InstanceData（mod、世界、配置等）
+  if [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid" ]; then
+    echo "🔄 恢复实例数据..."
+    run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
+    run_sudo cp -r "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null && \
+      echo "✅ 实例数据已恢复（mod、世界、配置）"
   fi
 
-  # 实例配置
-  if tar -tzf "$backup_file" 2>/dev/null | grep -q "InstanceConfig/"; then
-    [ -f "$MCSM_DIR/InstanceConfig/$old_uuid.json" ] && mv "$MCSM_DIR/InstanceConfig/$old_uuid.json" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
-    echo "✅ 配置已从备份恢复"
+  # 恢复 InstanceConfig（Docker 配置）
+  if [ -f "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
+    echo "🔄 恢复实例配置..."
+    run_sudo cp "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null && \
+      echo "✅ 实例配置已恢复"
   else
-    python3 "$CREATE_SCRIPT" "$name" "$uuid" "$MCSM_DIR/InstanceConfig" 2>/dev/null
-    echo "✅ 配置已从模板创建"
+    # 备份中没有配置，从模板创建
+    python3 "$CREATE_SCRIPT" "$name" "$uuid" "$MCSM_DIR/InstanceConfig" 2>/dev/null && \
+      echo "✅ 配置已从模板创建"
   fi
 
-  # --full 额外
+  # 场景三：完整迁移 - 额外恢复节点配置、凭据、DDNS
   if [ "$mode" = "--full" ]; then
-    tar -xzf "$backup_file" --wildcards "*RemoteServiceConfig*" "*credentials.md*" "*ddns-go-data*" -C / 2>/dev/null
-    echo "✅ 节点/凭据/DDNS 已恢复"
+    echo "🔄 恢复节点/凭据/DDNS..."
+    [ -d "$tmpdir/$MCSM_DIR/../web/data/RemoteServiceConfig" ] && \
+      run_sudo cp -r "$tmpdir/$MCSM_DIR/../web/data/RemoteServiceConfig"/* "$PROJECT_DIR/mcsm/web/data/RemoteServiceConfig/" 2>/dev/null && \
+      echo "✅ 节点配置已恢复"
+    [ -f "$tmpdir/$PROJECT_DIR/credentials.md" ] && \
+      run_sudo cp "$tmpdir/$PROJECT_DIR/credentials.md" "$PROJECT_DIR/" 2>/dev/null && \
+      echo "✅ 凭据已恢复"
+    [ -d "$tmpdir/$PROJECT_DIR/ddns-go-data" ] && \
+      run_sudo cp -r "$tmpdir/$PROJECT_DIR/ddns-go-data"/* "$PROJECT_DIR/ddns-go-data/" 2>/dev/null && \
+      echo "✅ DDNS 已恢复"
   fi
 
-  echo "✅ 完成"
+  # 清理临时目录
+  rm -rf "$tmpdir"
+
+  echo "✅ 恢复完成，重启 daemon..."
   docker compose restart mcsm-daemon 2>/dev/null
 }
 
@@ -165,7 +207,7 @@ UUID=$(get_uuid_by_name "$NAME")
 if [ -z "$UUID" ]; then
   echo "创建实例 [$NAME]..."
   NEW_UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
-  UUID=$(python3 "$CREATE_SCRIPT" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null || echo "1970" | sudo -S python3 "$CREATE_SCRIPT" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null)
+  UUID=$(python3 "$CREATE_SCRIPT" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null || run_sudo python3 "$CREATE_SCRIPT" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null)
   [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
   echo "✅ 已创建 (UUID: $UUID)"
 fi
