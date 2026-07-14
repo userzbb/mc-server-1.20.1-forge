@@ -4,8 +4,7 @@
 #   ./backup.sh                    ← 交互选择实例
 #   ./backup.sh forge-1.20.1       ← 备份指定实例
 
-BACKUP_DIR="/home/yuan/minecraft-server/backups"
-MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
+source "$(dirname "$0")/config.sh"
 
 # 获取实例列表（当前 + 备份中已删除的）
 get_instances() {

@@ -6,8 +6,7 @@
 #   ./restore.sh forge-1.20.1 instance     ← 重建实例
 #   ./restore.sh forge-1.20.1 --full       ← 完整迁移
 
-BACKUP_DIR="/home/yuan/minecraft-server/backups"
-MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
+source "$(dirname "$0")/config.sh"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; NC='\033[0m'
 
