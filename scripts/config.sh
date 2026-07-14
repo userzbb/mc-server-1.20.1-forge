@@ -1,9 +1,13 @@
 #!/bin/bash
 # Minecraft 服务器配置文件
-# 所有脚本从这里读取路径配置，迁移时只需修改此处
+# 所有脚本从这里读取路径配置
+# ⚠️ 迁移时只需修改 .env 文件中的 PROJECT_DIR，此处自动读取
 
-# 项目根目录
-PROJECT_DIR="/home/yuan/minecraft-server"
+# 从 .env 读取项目根目录
+if [ -f "$(dirname "$0")/../.env" ]; then
+  source "$(dirname "$0")/../.env"
+fi
+PROJECT_DIR="${PROJECT_DIR:-/home/yuan/minecraft-server}"
 
 # MCSManager 数据目录
 MCSM_DIR="$PROJECT_DIR/mcsm/daemon/data"
