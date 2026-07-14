@@ -92,28 +92,22 @@ do_restore() {
   docker compose restart mcsm-daemon 2>/dev/null
 }
 
-# 列出现有实例
-list_instances() {
-  echo "已有实例:"
-  for f in "$MCSM_DIR/InstanceConfig"/*.json; do
-    local n=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
-    [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "  $n"
-  done
-  echo ""
-}
-
 # === 交互模式 ===
 if [ $# -eq 0 ]; then
-  # 先列出现有实例
-  list_instances
-  # 选备份
+  # 1. 先选备份
   select_backup
-  # 从备份文件提取实例名
   backup_name=$(basename "$SELECTED_BACKUP" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
   echo ""
-  read -p "实例名称 ($backup_name): " NAME
+  # 2. 显示已有实例，或新建
+  echo "已有实例（可直接恢复）:"
+  for f in "$MCSM_DIR/InstanceConfig"/*.json; do
+    n=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
+    [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "  - $n"
+  done
+  echo ""
+  read -p "恢复到实例 ($backup_name): " NAME
   NAME="${NAME:-$backup_name}"
-  # 选模式
+  # 3. 选模式
   echo ""
   echo "恢复模式:"
   echo "  1. world     — 世界回档"
