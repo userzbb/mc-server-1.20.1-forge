@@ -9,13 +9,19 @@ MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; NC='\033[0m'
 
-# 获取实例列表
+# 获取实例列表（当前 + 备份中已删除的）
 get_instances() {
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
     local nickname=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
     local uuid=$(basename "$f" .json)
     [ -n "$nickname" ] && [ "$nickname" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "$uuid:$nickname"
   done
+  # 补充已删除但有备份的实例（不重复列出现有的）
+  local existing=$(for f in "$MCSM_DIR/InstanceConfig"/*.json; do python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null; done)
+  for bf in "$BACKUP_DIR"/backup-*.tar.gz; do
+    local bname=$(basename "$bf" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
+    [ -n "$bname" ] && echo "$existing" | grep -qx "$bname" || echo ":$bname"
+  done | sort -u
 }
 
 # 交互选择实例
@@ -24,13 +30,20 @@ select_instance() {
   while IFS= read -r line; do instances+=("$line"); done < <(get_instances)
   echo "可用实例:"
   for i in "${!instances[@]}"; do
+    local u=$(echo "${instances[$i]}" | cut -d: -f1)
     local n=$(echo "${instances[$i]}" | cut -d: -f2)
-    echo "  $((i+1)). $n"
+    local tag=""
+    [ -z "$u" ] && tag=" (已删除)"
+    echo "  $((i+1)). $n$tag"
   done
   read -p "选择实例 (1-${#instances[@]}): " choice
   local s="${instances[$((choice-1))]}"
   UUID=$(echo "$s" | cut -d: -f1)
   NAME=$(echo "$s" | cut -d: -f2)
+  if [ -z "$UUID" ]; then
+    echo "❌ 实例 [$NAME] 已从面板删除，无法恢复。请先在面板重建同名实例后重试。"
+    exit 1
+  fi
 }
 
 # 交互选择模式

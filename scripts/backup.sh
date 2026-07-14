@@ -7,13 +7,19 @@
 BACKUP_DIR="/home/yuan/minecraft-server/backups"
 MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
 
-# 获取实例列表
+# 获取实例列表（当前 + 备份中已删除的）
 get_instances() {
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
     local nickname=$(python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null)
     local uuid=$(basename "$f" .json)
     [ -n "$nickname" ] && [ "$nickname" != "__MCSM_GLOBAL_INSTANCE__" ] && echo "$uuid:$nickname"
   done
+  # 补充已删除但有备份的实例（不重复列出现有的）
+  local existing=$(for f in "$MCSM_DIR/InstanceConfig"/*.json; do python3 -c "import json; print(json.load(open('$f')).get('nickname',''))" 2>/dev/null; done)
+  for bf in "$BACKUP_DIR"/backup-*.tar.gz; do
+    local bname=$(basename "$bf" | sed 's/^backup-//;s/-[0-9]\{8\}.*\.tar\.gz$//')
+    [ -n "$bname" ] && echo "$existing" | grep -qx "$bname" || echo ":$bname"
+  done | sort -u
 }
 
 # 交互选择
