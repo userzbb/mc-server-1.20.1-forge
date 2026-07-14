@@ -129,6 +129,26 @@ docker compose restart mcsm-web
 | `entity_model_features` | 实体模型，纯客户端 |
 | `appleskin` | 饱食度 HUD，纯客户端 |
 
+## 🔧 配置管理
+
+### 全局变量
+
+路径配置统一在 `scripts/config.sh`，迁移时只需修改此文件：
+
+```bash
+PROJECT_DIR="/home/yuan/minecraft-server"   # ← 改成新机器的路径
+```
+
+### 仍需手动修改的路径
+
+以下文件包含硬编码路径，迁移时也需要改：
+
+| 文件 | 路径 | 说明 |
+|------|------|------|
+| `docker-compose.yml` | `/home/yuan/minecraft-server/mods` | Mod 挂载卷 |
+| `docker-compose.yml` | `MCSM_DOCKER_WORKSPACE_PATH` | 实例工作目录 |
+| `instance-config.json` | `/home/yuan/minecraft-server/mods` | Docker 配置模板 |
+
 ## 💾 备份 & 恢复
 
 两个脚本在 `scripts/` 目录，自动读取实例名称（forge-1.20.1、tacz-craft）。
