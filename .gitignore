@@ -18,3 +18,4 @@ claude-resume
 # Mod 文件
 /mods/*.jar
 temp-mods/
+home/
