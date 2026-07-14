@@ -1,5 +1,5 @@
 # 📦 TACZcraft 实例 Mod 清单
-> **Mod 数量：** 82
+> **Mod 数量：** 85
 
 | Mod | 版本 |
 |-----|------|
@@ -8,6 +8,7 @@
 | alexsmobs | 1.22.9 |
 | alltheleaks | 0.1.4-beta+1.20.1-forge |
 | AoA3 | 1.20.1-3.7.1-all |
+| appleskin-forge-mc1.20.1 | forge-mc1.20.1-2.5.1 |
 | appliedenergistics2-forge | forge-15.4.2 |
 | architectury | 9.2.14-forge |
 | balm-forge | forge-1.20.1-7.3.31-all |
@@ -16,6 +17,7 @@
 | BrandonsCore | 1.20.1-3.2.1.302-universal |
 | citadel | 2.6.1-1.20.1 |
 | CodeChickenLib | 1.20.1-4.4.0.516-universal |
+| Controlling-forge | forge-1.20.1-12.0.2 |
 | create | 1.20.1-6.0.8 |
 | create_misc_and_things_ 1.20.1_4.0A |  |
 | createtaczauto | 1.3.7-forge-1.20.1 |
@@ -62,6 +64,7 @@
 | Quark | 4.0-462 |
 | quark_delight_1.0.0_forge_1.20.1 |  |
 | rhino-forge | forge-2001.2.3-build.10 |
+| Searchables-forge | forge-1.20.1-1.0.3 |
 | SJAP_Resharpened | 1.20.1-1.1.10 |
 | SlashBlade | 1.20.1-0.1.2 |
 | SlashBladeResharped | 1.20.1-1.2.32 |
