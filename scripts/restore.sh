@@ -3,8 +3,8 @@
 # 用法:
 #   ./restore.sh                           ← 交互菜单
 #   ./restore.sh forge-1.20.1 world        ← 世界回档
-#   ./restore.sh forge-1.20.1 instance -y  ← 重建实例（跳过确认）
-#   ./restore.sh forge-1.20.1 --full -y    ← 完整迁移
+#   ./restore.sh forge-1.20.1 instance     ← 重建实例
+#   ./restore.sh forge-1.20.1 --full       ← 完整迁移
 
 BACKUP_DIR="/home/yuan/minecraft-server/backups"
 MCSM_DIR="/home/yuan/minecraft-server/mcsm/daemon/data"
@@ -166,6 +166,7 @@ elif [ $# -eq 1 ]; then
   done
   [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
   select_mode
+  read -p "继续? (y/N) " confirm; [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
 
 elif [ $# -ge 2 ]; then
@@ -175,5 +176,6 @@ elif [ $# -ge 2 ]; then
     [ "$n" = "$NAME" ] && UUID=$(echo "$inst" | cut -d: -f1) && break
   done
   [ -z "$UUID" ] && echo "❌ 未找到实例: $NAME" && exit 1
+  read -p "继续? (y/N) " confirm; [ "$confirm" != "y" ] && [ "$confirm" != "Y" ] && echo "已取消" && exit 0
   do_restore "$NAME" "$MODE" "$UUID"
 fi
