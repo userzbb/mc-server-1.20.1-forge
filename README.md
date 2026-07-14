@@ -107,14 +107,27 @@ docker compose restart mcsm-web
 
 ## 📦 Mod 列表
 
-84 个 Mod，完整清单见 **[instances/forge-1.20.1/mod-list.md](instances/forge-1.20.1/mod-list.md)**。
+### forge-1.20.1 实例
+84 个 Mod，清单见 **[instances/forge-1.20.1/mod-list.md](instances/forge-1.20.1/mod-list.md)**。
 
-### 不能装的 Mod（会导致崩溃）
+### tacz-craft 实例
+95 个 Mod，清单见 **[instances/tacz-craft/mod-list.md](instances/tacz-craft/mod-list.md)**。
 
-- `entity_texture_features` — 客户端 Mixin
-- `oculus` — 客户端光影
-- `sodiumextras` — 客户端渲染
-- `DGLabCraft` — 客户端 UI
+### 不能装到服务器的客户端 Mod
+
+| Mod | 原因 |
+|-----|------|
+| `entity_texture_features` | Mixin 引用 Screen 类 → 崩溃 |
+| `oculus` | 客户端光影 Mixin → 崩溃 |
+| `sodiumextras` | 客户端渲染 Mixin → 崩溃 |
+| `DGLabCraft` | 客户端 UI Mixin → 崩溃 |
+| `imblocker` | 输入法冲突，纯客户端 |
+| `tacticalmovement` | 客户端移动辅助 |
+| `jecharacters` | 拼音搜索，缺服务端类 |
+| `sound-physics-remastered` | 物理音效，纯客户端 |
+| `entityculling` | 实体渲染裁剪，纯客户端 |
+| `entity_model_features` | 实体模型，纯客户端 |
+| `appleskin` | 饱食度 HUD，纯客户端 |
 
 ## 🔧 防火墙
 
