@@ -1,5 +1,5 @@
 # 📦 TACZcraft 实例 Mod 清单
-> **Mod 数量：** 80
+> **Mod 数量：** 82
 
 | Mod | 版本 |
 |-----|------|
@@ -39,6 +39,8 @@
 | iceandfire | 2.1.13-1.20.1-beta-5 |
 | igleelib | 1.20.1-1.2.5 |
 | ironchest | 1.20.1-14.4.4 |
+| Jade | 1.20.1-Forge-11.13.2 |
+| jei | 1.20.1-forge-15.20.0.134 |
 | jsconf | 1.1.1 |
 | JustEnoughProfessions-forge | forge-1.20.1-3.0.1 |
 | kaleidoscopecookery | 1.4.1-forge+mc1.20.1 |
