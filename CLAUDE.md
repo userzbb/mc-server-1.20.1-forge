@@ -192,6 +192,8 @@ docker compose restart mcsm-daemon
 ./scripts/restore.sh forge-1.20.1 instance  # instance / world / --full
 ```
 
+**清理孤儿实例：** `./scripts/cleanup_orphans.sh` 或 restore 时自动清理
+
 **restore.sh 交互模式流程：**
 1. 选择备份文件
 2. 选择已有实例（编号）或新建实例（可自定义名称）

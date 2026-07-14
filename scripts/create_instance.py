@@ -29,11 +29,11 @@ cfg = {
 }
 
 data = json.dumps(cfg, indent=2, ensure_ascii=False)
-# 写入临时文件，然后 mv 到目标位置（用 sudo 绕过权限）
+# 写入临时文件，用 sudo mv
 import tempfile
 tmp = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json')
 tmp.write(data)
 tmp.close()
 subprocess.run(['sudo', 'mv', tmp.name, cfg_path], check=True)
-os.chmod(cfg_path, 0o644)
+subprocess.run(['sudo', 'chmod', '644', cfg_path], check=True)
 print(uuid)

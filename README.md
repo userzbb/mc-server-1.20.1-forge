@@ -165,22 +165,26 @@ PROJECT_DIR=/home/yuan/minecraft-server   # ← 改成新机器的路径
 ### restore.sh — 恢复
 
 ```bash
-./scripts/restore.sh                     # 交互菜单选择实例 + 恢复模式
-./scripts/restore.sh --list              # 列出可用备份
-./scripts/restore.sh forge-1.20.1 world  # 直接指定：世界回档
-./scripts/restore.sh forge-1.20.1 instance # 直接指定：重建实例
-./scripts/restore.sh forge-1.20.1 --full # 直接指定：完整迁移
+./scripts/restore.sh                           # 交互模式（选备份→选实例→选模式）
+./scripts/restore.sh --list                    # 列出可用备份
+./scripts/restore.sh forge-1.20.1 instance     # 直接指定实例名和模式
+./scripts/restore.sh forge-1.20.1 --full       # 完整迁移
 ```
 
-三种恢复模式：
-- **world** — 恢复 `world/` + server.properties（实例配置不动）
-- **instance** — 恢复实例全部数据，UUID 变更自动迁移
-- **--full** — 恢复全部（含凭据、DDNS、节点配置）
+**交互模式流程：**
+1. 选择备份文件
+2. 选择已有实例（编号）或新建实例（可自定义名称）
+3. 选择恢复模式（world / instance / --full）
+4. 确认执行
 
-- 自动找最新备份，提示先停止实例
-- UUID 变更时自动迁移数据目录
-- 备份中缺少实例配置时，自动从 `instance-config.json` 模板补全 Docker 配置  
-- 已删除的实例在列表中标注「已删除」，需先重建再恢复
+**直接指定模式：**
+- 如果实例不存在，自动创建
+- 如果备份名对不上，列出让用户选
+
+三种恢复模式：
+- **world** — 只恢复 `world/` + server.properties
+- **instance** — 恢复实例全部数据，UUID 变更自动迁移，Docker 配置自动补全
+- **--full** — 完整迁移（含凭据、DDNS、节点配置）
 
 所有端口集成在 `mc-server` 这个 firewalld 服务里。GUI（`firewall-config`）中需要：
 - **FedoraWorkstation** 区域 → 勾选 `mc-server`
