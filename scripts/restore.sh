@@ -5,7 +5,10 @@
 #   ./restore.sh forge-1.20.1 instance  # 直接指定
 #   ./restore.sh --list                 # 列出备份
 
-source "$(dirname "$0")/config.sh"
+# 直接定义路径，不依赖 config.sh
+PROJECT_DIR="/home/yuan/minecraft-server"
+MCSM_DIR="$PROJECT_DIR/mcsm/daemon/data"
+BACKUP_DIR="$PROJECT_DIR/backups"
 
 CREATE_SCRIPT="$(dirname "$0")/create_instance.py"
 
@@ -108,26 +111,24 @@ do_restore() {
   echo "🔄 解压备份..."
   tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
 
-  # 使用 find 动态查找备份中的 InstanceData 目录
+  # 用 find 动态查找备份中的 InstanceData 目录
   local backup_instance_dir=$(find "$tmpdir" -type d -name "InstanceData" -path "*/mcsm/*" 2>/dev/null | head -1)
 
   if [ -n "$backup_instance_dir" ]; then
-    local old_instance_dir=$(find "$backup_instance_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1)
-
-    if [ -n "$old_instance_dir" ]; then
-      local old_uuid=$(basename "$old_instance_dir")
+    # 找到备份中的旧 UUID 目录
+    local old_uuid=$(find "$backup_instance_dir" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | head -1 | xargs basename)
+    if [ -n "$old_uuid" ]; then
       echo "🔄 恢复实例数据 (旧UUID: $old_uuid → 新UUID: $uuid)..."
-
       run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
-      run_sudo cp -r "$old_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null &&         echo "✅ 实例数据已恢复（mod、世界、配置）"
+      run_sudo cp -r "$backup_instance_dir/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null && \
+        echo "✅ 实例数据已恢复（mod、世界、配置）"
 
-      local backup_config="$backup_instance_dir/../InstanceConfig/$old_uuid.json"
-      if [ -f "$backup_config" ]; then
+      # 更新实例配置文件
+      local backup_config=$(find "$tmpdir" -name "$old_uuid.json" -path "*/InstanceConfig/*" 2>/dev/null | head -1)
+      if [ -n "$backup_config" ]; then
         run_sudo cp "$backup_config" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
         run_sudo sed -i "s/$old_uuid/$uuid/g" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
         echo "✅ 实例配置已更新"
-      else
-        python3 "$CREATE_SCRIPT" "$name" "$uuid" "$MCSM_DIR/InstanceConfig" 2>/dev/null &&           echo "✅ 配置已从模板创建"
       fi
     fi
   else
