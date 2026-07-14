@@ -36,11 +36,14 @@ get_instances() {
 
 # 自动补全 Docker 配置（从模板）
 apply_docker_config() {
+  local uuid="$1" cfg_path="$2" name="$3"
+  local tmpf=$(mktemp)
   python3 -c "
-import json, os, subprocess, sys
-uuid = '$1'
-cfg_path = '$2'
-name = '$3'
+import json
+uuid = '$uuid'
+cfg_path = '$cfg_path'
+name = '$name'
+tmpf = '$tmpf'
 with open(cfg_path) as f:
     c = json.load(f)
 with open('/home/yuan/minecraft-server/instance-config.json') as t:
@@ -49,16 +52,14 @@ c['processType'] = 'docker'
 c['cwd'] = f'data/InstanceData/{uuid}'
 c['docker'] = tmpl['docker']
 c['docker']['containerName'] = f'mc-{name}'
-try:
-    with open(cfg_path, 'w') as f:
-        json.dump(c, f, indent=2, ensure_ascii=False)
-except PermissionError:
-    data = json.dumps(c, indent=2, ensure_ascii=False)
-    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
-    if r.returncode != 0:
-        sys.exit(1)
-print('OK')
-" 2>/dev/null
+with open(tmpf, 'w') as f:
+    json.dump(c, f, indent=2, ensure_ascii=False)
+"
+  if [ -f "$tmpf" ]; then
+    cp "$tmpf" "$cfg_path" 2>/dev/null || echo "1970" | sudo -S cp "$tmpf" "$cfg_path" 2>/dev/null
+    rm -f "$tmpf"
+    echo "OK"
+  fi
 }
 
 # 恢复逻辑（世界/实例/完整）
@@ -150,7 +151,7 @@ select_instance() {
     read -p "新实例名称 ($NAME): " new_name
     NAME="${new_name:-$NAME}"
     UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
-    sudo python3 -c "import json; json.dump({"nickname":"'$NAME'"}, open('$MCSM_DIR/InstanceConfig/$UUID.json','w'), indent=2)"
+    sudo python3 -c "import json; json.dump({"nickname":"'$NAME'"}, open(sys.argv[2],'w'), indent=2)" "$NAME" "$MCSM_DIR/InstanceConfig/$UUID.json"
     mkdir -p "$MCSM_DIR/InstanceData/$UUID"
     echo "✅ 已创建实例: $NAME"
   fi
