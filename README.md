@@ -159,7 +159,7 @@ docker compose restart mcsm-web
 
 三种恢复模式：
 - **world** — 恢复 `world/` + server.properties（实例配置不动）
-- **instance** — 恢复实例全部数据 + 配置（UUID 变了需手动改）
+- **instance** — 恢复实例全部数据 + 配置（UUID 变更自动迁移）
 - **--full** — 恢复全部（含凭据、DDNS、节点配置）
 
 恢复时自动找最新备份，会提示先停止实例后执行。

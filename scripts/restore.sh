@@ -92,9 +92,17 @@ case "$MODE" in
     ;;
   instance)
     echo "🔄 恢复实例全部数据..."
+    # 找出备份中的旧 UUID
+    OLD_UUID=$(tar -tzf "$BACKUP_FILE" | grep "InstanceData/" | head -1 | cut -d/ -f9)
     tar -xzf "$BACKUP_FILE" -C / 2>/dev/null
+    # 如果 UUID 变了，自动迁移数据
+    if [ -n "$OLD_UUID" ] && [ "$OLD_UUID" != "$UUID" ]; then
+      echo "ℹ️  UUID 已变更 ($OLD_UUID → $UUID)，正在迁移数据..."
+      [ -d "$MCSM_DIR/InstanceData/$OLD_UUID" ] && mv "$MCSM_DIR/InstanceData/$OLD_UUID"/* "$MCSM_DIR/InstanceData/$UUID"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$OLD_UUID"
+      [ -f "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" ] && mv "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null
+      echo "✅ 数据已迁移到新 UUID"
+    fi
     echo -e "${GREEN}✅ 实例数据已恢复。${NC}"
-    echo "⚠️  如果 UUID 变了，需要手动更新新 UUID 的配置"
     ;;
   --full)
     echo "🔄 完整恢复..."
