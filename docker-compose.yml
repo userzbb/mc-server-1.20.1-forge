@@ -20,7 +20,7 @@ services:
     ports:
       - "24444:24444"                # ✅ 守护进程 API 端口
     environment:
-      - MCSM_DOCKER_WORKSPACE_PATH=/opt/mcsmanager/daemon/data/InstanceData
+      - MCSM_DOCKER_WORKSPACE_PATH=/home/yuan/minecraft-server/mcsm/daemon/data/InstanceData
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
