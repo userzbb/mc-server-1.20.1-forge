@@ -129,6 +129,33 @@ docker compose restart mcsm-web
 | `entity_model_features` | 实体模型，纯客户端 |
 | `appleskin` | 饱食度 HUD，纯客户端 |
 
+## 💾 备份与恢复
+
+### 备份内容
+
+备份包含以下重要数据：
+- **InstanceData** — 实例数据（mod、世界存档、配置文件）
+- **InstanceConfig** — 实例 Docker 配置（端口、环境变量、挂载卷）
+- **RemoteServiceConfig** — MCSManager 节点配置
+- **credentials.md** — 所有密码和密钥
+- **ddns-go-data/** — DDNS 配置
+
+### 使用方法
+
+```bash
+# 交互式备份（选择实例）
+./scripts/backup.sh
+
+# 列出可用备份
+./scripts/backup.sh --list
+
+# 交互式恢复
+./scripts/restore.sh
+
+# 直接恢复到指定实例
+./scripts/restore.sh forge-1.20.1 instance
+```
+
 ## 🔧 配置管理
 
 **首次使用或迁移时，需要手动配置这两个文件：**
