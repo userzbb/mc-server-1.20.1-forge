@@ -145,6 +145,7 @@ docker compose restart mcsm-web
 
 备份内容：世界存档、实例 Docker 配置、MCSManager 节点配置、credentials.md、ddns-go-data。
 备份位置：`backups/backup-实例名-日期.tar.gz`
+自动保留：同一实例仅保留最近 **2 个** 备份，旧的自动清理。
 
 ### restore.sh — 恢复
 

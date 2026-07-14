@@ -217,4 +217,6 @@ docker compose restart mcsm-web
 
 # 备份指定实例
 ./scripts/backup.sh forge-1.20.1
+
+# 脚本自动保留最近 2 个备份
 ```
