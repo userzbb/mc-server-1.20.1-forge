@@ -174,9 +174,13 @@ fi
 
 UUID=$(get_uuid_by_name "$NAME")
 if [ -z "$UUID" ]; then
-  echo "❌ 实例 [$NAME] 不存在，请先在面板中创建"
-  echo "   MCSManager 面板 → 终端 → 主服务器 → 创建实例"
-  exit 1
+  echo "实例 [$NAME] 不存在，正在自动创建..."
+  NEW_UUID=$(python3 -c "import uuid; print(uuid.uuid4().hex)")
+  UUID=$(python3 "$(dirname "$0")/create_instance.py" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null || run_sudo python3 "$(dirname "$0")/create_instance.py" "$NAME" "$NEW_UUID" "$MCSM_DIR/InstanceConfig" 2>/dev/null)
+  [ -z "$UUID" ] && echo "❌ 创建失败" && exit 1
+  echo "✅ 已创建 (UUID: $UUID)"
+  docker compose restart mcsm-daemon 2>/dev/null
+  echo "ℹ️  daemon 已重启，面板上应该能看到新实例了"
 fi
 
 do_restore "$NAME" "$MODE" "$UUID" "$SELECTED_BACKUP"
