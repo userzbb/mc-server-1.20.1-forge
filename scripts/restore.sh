@@ -143,8 +143,35 @@ with open('$tmpconfig', 'w') as f:
     ;;
   --full)
     echo "🔄 完整恢复..."
+    OLD_UUID=$(tar -tzf "$BACKUP_FILE" | grep "InstanceData/" | head -1 | cut -d/ -f9)
     tar -xzf "$BACKUP_FILE" -C / 2>/dev/null
+    if [ -n "$OLD_UUID" ] && [ "$OLD_UUID" != "$UUID" ]; then
+      echo "ℹ️  UUID 已变更 ($OLD_UUID → $UUID)，正在迁移数据..."
+      [ -d "$MCSM_DIR/InstanceData/$OLD_UUID" ] && mv "$MCSM_DIR/InstanceData/$OLD_UUID"/* "$MCSM_DIR/InstanceData/$UUID"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$OLD_UUID"
+    fi
+    if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
+      echo "ℹ️  备份中无实例配置，从模板自动配置 Docker 模式..."
+      if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
+        local tmpconfig=$(mktemp)
+        python3 -c "
+import json
+with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
+    c = json.load(f)
+with open('/home/yuan/minecraft-server/instance-config.json') as t:
+    tmpl = json.load(t)
+c['processType'] = 'docker'
+c['cwd'] = 'data/InstanceData/$UUID'
+c['docker'] = tmpl['docker']
+c['docker']['containerName'] = 'mc-$NAME'
+with open('$tmpconfig', 'w') as f:
+    json.dump(c, f, indent=2, ensure_ascii=False)
+" 2>/dev/null
+        cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json" && rm -f "$tmpconfig"
+        echo "✅ Docker 配置已从模板应用"
+      fi
+    else
+      [ -f "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" ] && mv "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null
+    fi
     echo -e "${GREEN}✅ 全部数据已恢复。${NC}"
-    echo "然后: 1. docker compose up -d  2. 面板重建实例  3. 复制 mods"
     ;;
 esac
