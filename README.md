@@ -129,19 +129,41 @@ docker compose restart mcsm-web
 | `entity_model_features` | 实体模型，纯客户端 |
 | `appleskin` | 饱食度 HUD，纯客户端 |
 
-## 💾 备份
+## 💾 备份 & 恢复
+
+两个脚本在 `scripts/` 目录，自动读取实例名称（forge-1.20.1、tacz-craft）。
+
+### backup.sh — 备份
+
+扫描 `mcsm/daemon/data/InstanceConfig/` 自动匹配实例名 → UUID，不需要手动输 ID。
 
 ```bash
-# 一键备份
-./scripts/backup.sh forge-1.20.1
-./scripts/backup.sh tacz-craft
-
-# 一键恢复
-./scripts/restore.sh forge-1.20.1 world
-./scripts/restore.sh forge-1.20.1 --full
+./scripts/backup.sh                    # 显示所有实例
+./scripts/backup.sh forge-1.20.1       # 备份 forge（世界+配置+节点+凭据+DDNS）
 ```
 
-备份文件在 `backups/` 目录，保留 30 天自动清理。
+备份内容：世界存档、实例 Docker 配置、MCSManager 节点配置、credentials.md、ddns-go-data。
+备份位置：`backups/backup-实例名-日期.tar.gz`
+
+### restore.sh — 恢复
+
+三种恢复模式，适用于不同场景：
+
+```bash
+# 场景一：世界回档（世界损坏、熊孩子破坏）
+./scripts/restore.sh forge-1.20.1 world
+# 恢复内容：world/ + server.properties（实例配置不动）
+
+# 场景二：重建实例（实例被删、数据目录丢失）
+./scripts/restore.sh forge-1.20.1 instance
+# 恢复内容：实例全部数据 + 配置（UUID 变了需手动修改）
+
+# 场景三：完整迁移（换新机器）
+./scripts/restore.sh forge-1.20.1 --full
+# 恢复内容：世界 + 配置 + 节点 + 凭据 + DDNS
+```
+
+恢复时脚本会自动找最新备份，先确认停止实例后再执行。
 
 所有端口集成在 `mc-server` 这个 firewalld 服务里。GUI（`firewall-config`）中需要：
 - **FedoraWorkstation** 区域 → 勾选 `mc-server`
