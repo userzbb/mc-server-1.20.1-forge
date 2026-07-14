@@ -33,6 +33,15 @@ select_instance() {
   NAME=$(echo "$selected" | cut -d: -f2)
 }
 
+# 列出实例
+if [ "$1" = "--list" ]; then
+  echo "可用实例:"
+  for inst in $(get_instances); do
+    echo "  $(echo $inst | cut -d: -f2)"
+  done
+  exit 0
+fi
+
 # 无参数 → 交互选择
 if [ $# -eq 0 ]; then
   select_instance
