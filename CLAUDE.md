@@ -167,6 +167,12 @@ docker compose restart mcsm-daemon
 
 所有密码和密钥在 `credentials.md`（已 gitignore），不要硬编码到任何跟踪的文件中。
 
+## 配置管理
+
+全局路径配置在 `scripts/config.sh`，迁移时先改这里。
+
+`docker-compose.yml` 和 `instance-config.json` 也包含硬编码路径（`/home/yuan/...`），需一并修改。
+
 ## 备份与恢复
 
 备份脚本自动保留同一实例最近 2 个备份，旧的不占空间。
