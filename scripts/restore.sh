@@ -92,6 +92,22 @@ do_restore() {
   docker compose restart mcsm-daemon 2>/dev/null
 }
 
+# 自动清理孤儿实例数据
+cleanup_orphans() {
+  for d in "$MCSM_DIR/InstanceData"/*/; do
+    local uuid=$(basename "$d")
+    [ -z "$uuid" ] && continue
+    [ "$uuid" = "global0001" ] && continue
+    if [ ! -f "$MCSM_DIR/InstanceConfig/$uuid.json" ]; then
+      rm -rf "$d"
+      echo "🗑️  已清理孤儿: $uuid"
+    fi
+  done
+}
+
+# 运行清理
+cleanup_orphans
+
 # === 交互模式 ===
 if [ $# -eq 0 ]; then
   # 1. 先选备份
