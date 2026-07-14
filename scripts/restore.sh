@@ -10,6 +10,16 @@ source "$(dirname "$0")/config.sh"
 
 RED='\033[0;31m'; GREEN='\033[0;32m'; NC='\033[0m'
 
+# --list 参数
+if [ "$1" = "--list" ]; then
+  echo "可用备份:"
+  for f in "$BACKUP_DIR"/backup-*.tar.gz; do
+    [ -f "$f" ] && echo "  $(basename "$f") ($(du -h "$f" | cut -f1))"
+  done
+  [ -z "$(ls -A "$BACKUP_DIR" 2>/dev/null)" ] && echo "  （无备份）"
+  exit 0
+fi
+
 # 获取实例列表
 get_instances() {
   for f in "$MCSM_DIR/InstanceConfig"/*.json; do
