@@ -112,8 +112,32 @@ case "$MODE" in
     if [ -n "$OLD_UUID" ] && [ "$OLD_UUID" != "$UUID" ]; then
       echo "ℹ️  UUID 已变更 ($OLD_UUID → $UUID)，正在迁移数据..."
       [ -d "$MCSM_DIR/InstanceData/$OLD_UUID" ] && mv "$MCSM_DIR/InstanceData/$OLD_UUID"/* "$MCSM_DIR/InstanceData/$UUID"/ 2>/dev/null && rm -rf "$MCSM_DIR/InstanceData/$OLD_UUID"
+    fi
+    # 如果备份中没有 InstanceConfig（实例已删除后备份的），自动应用模板配置
+    if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
+      echo "ℹ️  备份中无实例配置，从 instance-config.json 模板自动配置 Docker 模式..."
+      if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
+        local tmpconfig=$(mktemp)
+        python3 -c "
+import json
+with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
+    c = json.load(f)
+with open('/home/yuan/minecraft-server/instance-config.json') as t:
+    tmpl = json.load(t)
+c['processType'] = 'docker'
+c['cwd'] = 'data/InstanceData/$UUID'
+c['docker'] = tmpl['docker']
+c['docker']['containerName'] = 'mc-$NAME'
+with open('$tmpconfig', 'w') as f:
+    json.dump(c, f, indent=2, ensure_ascii=False)
+" 2>/dev/null
+        cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json"
+        rm -f "$tmpconfig"
+        echo "✅ Docker 配置已从模板应用"
+      fi
+    else
+      # 备份中有 InstanceConfig
       [ -f "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" ] && mv "$MCSM_DIR/InstanceConfig/$OLD_UUID.json" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null
-      echo "✅ 数据已迁移到新 UUID"
     fi
     echo -e "${GREEN}✅ 实例数据已恢复。${NC}"
     ;;
