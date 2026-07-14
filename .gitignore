@@ -23,3 +23,8 @@ claude-resume
 
 # Mod 文件（二进制，用 mod-list.md 记录清单）
 /mods/*.jar
+
+# 临时 mods 目录
+temp-mods/
+backups/
+*.tar.gz
