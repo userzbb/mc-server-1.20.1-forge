@@ -117,7 +117,7 @@ case "$MODE" in
     if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
       echo "ℹ️  备份中无实例配置，从 instance-config.json 模板自动配置 Docker 模式..."
       if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        local tmpconfig=$(mktemp)
+        tmpconfig=$(mktemp)
         python3 -c "
 import json
 with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
@@ -152,7 +152,7 @@ with open('$tmpconfig', 'w') as f:
     if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
       echo "ℹ️  备份中无实例配置，从模板自动配置 Docker 模式..."
       if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        local tmpconfig=$(mktemp)
+        tmpconfig=$(mktemp)
         python3 -c "
 import json
 with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
