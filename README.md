@@ -107,7 +107,7 @@ docker compose restart mcsm-web
 
 ## 📦 Mod 列表
 
-84 个 Mod，完整清单见 **[mod-list.md](mod-list.md)**。
+84 个 Mod，完整清单见 **[instances/forge-1.20.1/mod-list.md](instances/forge-1.20.1/mod-list.md)**。
 
 ### 不能装的 Mod（会导致崩溃）
 
@@ -148,13 +148,15 @@ docker compose restart mcsm-web
 ├── instance-config.json        # Docker 实例配置模板
 ├── server.properties.template  # 服务端配置模板
 ├── README.md
-├── mod-list.md                 # Mod 完整清单
 ├── CLAUDE.md                   # AI 指令
 ├── credentials.md              # 🔑 凭据（已 gitignore）
-├── docs/
-│   ├── 操作手册.md              # AI 详细运维指令
-│   ├── GUI操作指南.md           # 面板操作步骤
-│   └── 迁移指南.md              # 迁移恢复步骤
+├── instances/
+│   ├── forge-1.20.1/
+│   │   └── mod-list.md         # forge 实例 Mod 清单（84 个）
+│   └── tacz-craft/
+│       ├── mod-list.md         # tacz 实例 Mod 清单（95 个）
+│       └── server.properties.template
+├── docs/                       # 操作手册、GUI指南、迁移指南
 ├── mods/                       # Mod jar 文件
 ├── mcsm/                       # MCSManager 数据
 └── ddns-go-data/               # DDNS 配置

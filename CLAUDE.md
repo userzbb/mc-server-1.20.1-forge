@@ -25,7 +25,8 @@ Minecraft 服务器通过 MCSManager 面板创建 Docker 实例，不直接由 d
 | `credentials.md` | 所有密码和密钥 | ❌ gitignore |
 | `instance-config.json` | Docker 实例配置模板 | ✅ |
 | `server.properties.template` | 服务端配置模板 | ✅ |
-| `mod-list.md` | 84 个 Mod 清单 | ✅ |
+| `instances/forge-1.20.1/mod-list.md` | forge 实例 Mod 清单（84 个） | ✅ |
+| `instances/tacz-craft/mod-list.md` | tacz 实例 Mod 清单（95 个） | ✅ |
 | `mods/*.jar` | Mod 二进制文件 | ❌ gitignore |
 | `mcsm/` | MCSManager 运行时数据（含实例数据） | ❌ gitignore |
 | `docs/` | 操作手册、GUI指南、迁移指南 | ✅ |
@@ -56,6 +57,20 @@ Mod 文件放在 `mods/` 目录，通过 Docker 卷挂载到容器的 `/mods`。
 首次启动自动安装。之后如需添加额外 Mod：
 - **自动（挂载卷）：** 在 `extraVolumes` 加 `"/host/path|/mods|ro"`
 - **手动（面板）：** 实例 → 文件管理 → 上传 `.jar` 到 `mods/`
+
+### ⚠️ CF_SERVER_MOD 不触发下载的坑
+
+症状：日志显示 `Forge version xxx is already installed`，然后直接启动原版 Forge，mods 目录为空。
+
+**原因：** 镜像检测到 Forge 已安装（从数据目录缓存或 Docker 镜像层缓存），跳过首次安装流程，连带 `CF_SERVER_MOD` 也跳过。
+
+**解决步骤：**
+1. 面板上**停止**实例
+2. 删除 Docker 容器：`sudo docker rm -f <容器名>`
+3. 删除宿主机上的实例数据目录：`mcsm/daemon/data/InstanceData/<UUID>/`（存档会丢！）
+4. 面板上**开启**实例，镜像会从头下载 Forge + 整合包
+
+**不要**在整合包实例上挂载公共 `mods/` 目录（`extraVolumes` 留空），否则 mod 会混入整合包。
 
 
 ## 网络架构
@@ -110,6 +125,32 @@ docker exec mcsm-web node -e "const http = require('http'); http.get('http://cat
 sudo chown 1000:1000 mcsm/daemon/data/InstanceData/<UUID>/server.properties
 sudo chown 1000:1000 mcsm/daemon/data/InstanceData/<UUID>/eula.txt
 ```
+
+### 开启作弊模式（OP 权限）
+
+所有服务器实例默认开启作弊模式。新创建实例后需要手动添加 OP：
+
+1. **修改 `ops.json`** — 添加玩家为管理员（有作弊/命令权限）：
+   ```json
+   [
+     {
+       "uuid": "<玩家 UUID>",
+       "name": "<游戏名>",
+       "level": 4,
+       "bypassesPlayerLimit": true
+     }
+   ]
+   ```
+   `level 4` 是最高权限。`bypassesPlayerLimit` 允许服务器满人时进入。
+
+2. **修改 `server.properties`** — 关闭出生点保护（否则 OP 也破坏不了出生点的方块）：
+   ```ini
+   spawn-protection=0
+   ```
+
+3. 修改后重启实例生效。
+   - `ops.json` 可以热加载（执行 `/op <玩家名>` 或直接改文件），不需要重启
+   - `server.properties` 需要重启
 
 ### 实例日志
 
