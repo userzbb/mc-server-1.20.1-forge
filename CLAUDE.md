@@ -172,7 +172,7 @@ docker compose restart mcsm-daemon
 | `credentials.md` | 凭据说明文档 | ❌ gitignore |
 | `instance-config.json` | Docker 实例配置模板 | ✅ 跟踪 |
 
-**凭据管理：** 所有密码在 `.secrets`，不要硬编码到代码中。
+**凭据管理：** 密码在 `.secrets`（gitignore），路径配置在 `.env`（git 跟踪）。用户需自行创建 `.secrets` 文件。
 
 ## 配置管理
 

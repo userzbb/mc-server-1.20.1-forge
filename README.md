@@ -131,18 +131,31 @@ docker compose restart mcsm-web
 
 ## 🔧 配置管理
 
-### 迁移配置
+**首次使用或迁移时，需要手动配置这两个文件：**
 
-**只需修改 `.env` 文件中的路径**，其他全部自动读取：
+### 1. `.env` — 路径配置（git 跟踪）
 
 ```bash
-# .env — 改这一个文件就行
-PROJECT_DIR=/home/yuan/minecraft-server   # ← 改成新机器的路径
+PROJECT_DIR=/home/你的用户名/minecraft-server   # ← 改成实际路径
 ```
 
-`docker-compose.yml` 和 `scripts/config.sh` 都会自动从 `.env` 读取。
+### 2. `.secrets` — 敏感数据（gitignore）
 
-> ⚠️ `instance-config.json` 中的 `extraVolumes` 路径仍需手动修改（Docker 配置模板，不属于脚本体系）
+```bash
+# 从模板创建
+cp .secrets.example .secrets
+# 编辑填入真实密码
+nano .secrets
+```
+
+内容：
+```
+SUDO_PASS=你的sudo密码
+```
+
+### 3. `credentials.md` — 说明文档（gitignore）
+
+这个文件是给人看的说明，不需要脚本读取。
 
 ## 💾 备份 & 恢复
 
