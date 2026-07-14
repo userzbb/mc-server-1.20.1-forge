@@ -99,17 +99,31 @@ do_restore() {
   tar -xzf "$backup_file" -C "$tmpdir" 2>/dev/null
 
   # 恢复 InstanceData（mod、世界、配置等）
-  if [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid" ]; then
+  backup_instance_dir=""
+  if [ -d "$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceData/$old_uuid" ]; then
+    backup_instance_dir="$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceData/$old_uuid"
+  elif [ -d "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid" ]; then
+    backup_instance_dir="$tmpdir/$MCSM_DIR/InstanceData/$old_uuid"
+  fi
+
+  if [ -n "$backup_instance_dir" ]; then
     echo "🔄 恢复实例数据..."
     run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
-    run_sudo cp -r "$tmpdir/$MCSM_DIR/InstanceData/$old_uuid"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null && \
+    run_sudo cp -r "$backup_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null && \
       echo "✅ 实例数据已恢复（mod、世界、配置）"
   fi
 
   # 恢复 InstanceConfig（Docker 配置）
-  if [ -f "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
+  backup_config_file=""
+  if [ -f "$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
+    backup_config_file="$tmpdir/home/yuan/minecraft-server/$MCSM_DIR/InstanceConfig/$old_uuid.json"
+  elif [ -f "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" ]; then
+    backup_config_file="$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json"
+  fi
+
+  if [ -n "$backup_config_file" ]; then
     echo "🔄 恢复实例配置..."
-    run_sudo cp "$tmpdir/$MCSM_DIR/InstanceConfig/$old_uuid.json" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null && \
+    run_sudo cp "$backup_config_file" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null && \
       echo "✅ 实例配置已恢复"
   else
     # 备份中没有配置，从模板创建
