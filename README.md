@@ -148,23 +148,20 @@ docker compose restart mcsm-web
 
 ### restore.sh — 恢复
 
-三种恢复模式，适用于不同场景：
-
 ```bash
-# 场景一：世界回档（世界损坏、熊孩子破坏）
-./scripts/restore.sh forge-1.20.1 world
-# 恢复内容：world/ + server.properties（实例配置不动）
-
-# 场景二：重建实例（实例被删、数据目录丢失）
-./scripts/restore.sh forge-1.20.1 instance
-# 恢复内容：实例全部数据 + 配置（UUID 变了需手动修改）
-
-# 场景三：完整迁移（换新机器）
-./scripts/restore.sh forge-1.20.1 --full
-# 恢复内容：世界 + 配置 + 节点 + 凭据 + DDNS
+./scripts/restore.sh                     # 交互菜单选择实例 + 恢复模式
+./scripts/restore.sh --list              # 列出可用备份
+./scripts/restore.sh forge-1.20.1 world  # 直接指定：世界回档
+./scripts/restore.sh forge-1.20.1 instance # 直接指定：重建实例
+./scripts/restore.sh forge-1.20.1 --full # 直接指定：完整迁移
 ```
 
-恢复时脚本会自动找最新备份，先确认停止实例后再执行。
+三种恢复模式：
+- **world** — 恢复 `world/` + server.properties（实例配置不动）
+- **instance** — 恢复实例全部数据 + 配置（UUID 变了需手动改）
+- **--full** — 恢复全部（含凭据、DDNS、节点配置）
+
+恢复时自动找最新备份，会提示先停止实例后执行。
 
 所有端口集成在 `mc-server` 这个 firewalld 服务里。GUI（`firewall-config`）中需要：
 - **FedoraWorkstation** 区域 → 勾选 `mc-server`
