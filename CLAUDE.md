@@ -183,14 +183,20 @@ docker compose restart mcsm-daemon
 ./scripts/backup.sh
 ./scripts/backup.sh --list       # 列出实例
 
-# 交互式恢复（菜单选择实例+模式）
+# 交互式恢复（选备份→选实例→选模式）
 ./scripts/restore.sh
 ./scripts/restore.sh --list      # 列出备份
 
 # 直接指定实例
 ./scripts/backup.sh forge-1.20.1
-./scripts/restore.sh forge-1.20.1 world  # 世界回档
+./scripts/restore.sh forge-1.20.1 instance  # instance / world / --full
 ```
+
+**restore.sh 交互模式流程：**
+1. 选择备份文件
+2. 选择已有实例（编号）或新建实例（可自定义名称）
+3. 选择恢复模式（world / instance / --full）
+4. 确认执行
 
 ## 常见问题
 
