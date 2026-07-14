@@ -117,22 +117,32 @@ case "$MODE" in
     if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
       echo "ℹ️  备份中无实例配置，从 instance-config.json 模板自动配置 Docker 模式..."
       if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        tmpconfig=$(mktemp)
         python3 -c "
-import json
-with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
+import json, os
+uuid = '$UUID'
+cfg_path = '$MCSM_DIR/InstanceConfig/$UUID.json'
+with open(cfg_path) as f:
     c = json.load(f)
 with open('/home/yuan/minecraft-server/instance-config.json') as t:
     tmpl = json.load(t)
 c['processType'] = 'docker'
-c['cwd'] = 'data/InstanceData/$UUID'
+c['cwd'] = f'data/InstanceData/{uuid}'
 c['docker'] = tmpl['docker']
 c['docker']['containerName'] = 'mc-$NAME'
-with open('$tmpconfig', 'w') as f:
-    json.dump(c, f, indent=2, ensure_ascii=False)
+# 尝试直接写入，失败则用 sudo
+try:
+    with open(cfg_path, 'w') as f:
+        json.dump(c, f, indent=2, ensure_ascii=False)
+except PermissionError:
+    import subprocess
+    import sys
+    data = json.dumps(c, indent=2, ensure_ascii=False)
+    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
+    if r.returncode != 0:
+        print('ERROR: 无法写入配置文件 (权限不足)', file=sys.stderr)
+        exit(1)
+print('OK')
 " 2>/dev/null
-        sudo cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json" 2>/dev/null || cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json"
-        rm -f "$tmpconfig"
         echo "✅ Docker 配置已从模板应用"
       fi
     else
@@ -152,21 +162,29 @@ with open('$tmpconfig', 'w') as f:
     if ! tar -tzf "$BACKUP_FILE" 2>/dev/null | grep -q "InstanceConfig/"; then
       echo "ℹ️  备份中无实例配置，从模板自动配置 Docker 模式..."
       if [ -f "/home/yuan/minecraft-server/instance-config.json" ]; then
-        tmpconfig=$(mktemp)
         python3 -c "
-import json
-with open('$MCSM_DIR/InstanceConfig/$UUID.json') as f:
+import json, os, subprocess, sys
+uuid = '$UUID'
+cfg_path = '$MCSM_DIR/InstanceConfig/$UUID.json'
+with open(cfg_path) as f:
     c = json.load(f)
 with open('/home/yuan/minecraft-server/instance-config.json') as t:
     tmpl = json.load(t)
 c['processType'] = 'docker'
-c['cwd'] = 'data/InstanceData/$UUID'
+c['cwd'] = f'data/InstanceData/{uuid}'
 c['docker'] = tmpl['docker']
 c['docker']['containerName'] = 'mc-$NAME'
-with open('$tmpconfig', 'w') as f:
-    json.dump(c, f, indent=2, ensure_ascii=False)
+try:
+    with open(cfg_path, 'w') as f:
+        json.dump(c, f, indent=2, ensure_ascii=False)
+except PermissionError:
+    data = json.dumps(c, indent=2, ensure_ascii=False)
+    r = subprocess.run(['sudo', 'tee', cfg_path], input=data, capture_output=True, text=True)
+    if r.returncode != 0:
+        print('ERROR: 无法写入配置文件 (权限不足)', file=sys.stderr)
+        exit(1)
+print('OK')
 " 2>/dev/null
-        cp "$tmpconfig" "$MCSM_DIR/InstanceConfig/$UUID.json" && rm -f "$tmpconfig"
         echo "✅ Docker 配置已从模板应用"
       fi
     else
