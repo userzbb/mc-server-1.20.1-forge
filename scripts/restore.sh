@@ -170,8 +170,13 @@ if [ $# -eq 0 ]; then
     [ -n "$n" ] && [ "$n" != "__MCSM_GLOBAL_INSTANCE__" ] && instances+=("$n")
   done
   for i in "${!instances[@]}"; do echo "  $((i+1)). ${instances[$i]}"; done
-  read -p "选择实例名称 ($backup_name): " NAME
-  NAME="${NAME:-$backup_name}"
+  echo "  $(( ${#instances[@]} + 1 )). 新建实例 (默认: $backup_name)"
+  read -p "选择实例 (1-$(( ${#instances[@]} + 1 ))): " choice
+  if [ "$choice" = "$(( ${#instances[@]} + 1 ))" ] || [ -z "$choice" ]; then
+    NAME="$backup_name"
+  else
+    NAME="${instances[$((choice-1))]}"
+  fi
   echo ""
   echo "恢复模式: 1=世界 2=全部 3=迁移"
   read -p "选择 (1-3): " m
