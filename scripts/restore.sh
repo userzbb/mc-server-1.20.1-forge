@@ -112,6 +112,8 @@ do_restore() {
   # 复制 InstanceData
   run_sudo mkdir -p "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
   run_sudo cp -r "$old_instance_dir"/* "$MCSM_DIR/InstanceData/$uuid/" 2>/dev/null
+  # 修复文件权限（容器内 uid=1000）
+  run_sudo chown -R 1000:1000 "$MCSM_DIR/InstanceData/$uuid" 2>/dev/null
   echo "✅ 实例数据已恢复（mod、世界、配置）"
 
   # 检测损坏文件（0 字节），从备份重新复制
