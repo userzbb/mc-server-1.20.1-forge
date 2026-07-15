@@ -29,11 +29,31 @@ cfg = {
 }
 
 data = json.dumps(cfg, indent=2, ensure_ascii=False)
-# 写入临时文件，用 sudo mv
+# 写入临时文件，用 sudo mv（从 .secrets 读取密码）
 import tempfile
 tmp = tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.json')
 tmp.write(data)
 tmp.close()
-subprocess.run(['sudo', 'mv', tmp.name, cfg_path], check=True)
-subprocess.run(['sudo', 'chmod', '644', cfg_path], check=True)
+
+# 读取 sudo 密码
+secrets_path = os.path.join(os.path.dirname(__file__), '..', '.secrets')
+sudo_pass = ''
+if os.path.exists(secrets_path):
+    with open(secrets_path) as sf:
+        for line in sf:
+            if line.startswith('SUDO_PASS'):
+                sudo_pass = line.split('=', 1)[1].strip()
+                break
+
+# 执行 mv
+if sudo_pass:
+    r = subprocess.run(['sudo', '-S', 'mv', tmp.name, cfg_path], input=sudo_pass.encode(), capture_output=True, text=True)
+    if r.returncode != 0:
+        # fallback: try writing directly
+        import shutil
+        shutil.copy(tmp.name, cfg_path)
+    subprocess.run(['sudo', '-S', 'chmod', '644', cfg_path], input=sudo_pass.encode(), capture_output=True, text=True)
+else:
+    subprocess.run(['sudo', 'mv', tmp.name, cfg_path], check=True)
+    subprocess.run(['sudo', 'chmod', '644', cfg_path], check=True)
 print(uuid)
