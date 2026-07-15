@@ -138,6 +138,24 @@ do_restore() {
     run_sudo cp "$old_config" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
     run_sudo sed -i "s/$old_uuid/$uuid/g" "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
     echo "✅ 实例配置已更新"
+
+  # 修复 cwd：确保包含正确的 UUID，去掉 changeWorkdir
+  else
+    python3 -c "
+import json
+uuid = '$uuid'
+path = '$MCSM_DIR/InstanceConfig/$uuid.json'
+with open(path) as f:
+    c = json.load(f)
+c['cwd'] = f'data/InstanceData/{uuid}'
+if 'changeWorkdir' in c.get('docker', {}):
+    c['docker']['changeWorkdir'] = False
+import os
+data = json.dumps(c, indent=2, ensure_ascii=False)
+with open('/tmp/mcsm_tmp.json', 'w') as f:
+    f.write(data)
+" 2>/dev/null && run_sudo mv /tmp/mcsm_tmp.json "$MCSM_DIR/InstanceConfig/$uuid.json" 2>/dev/null
+    echo "✅ cwd 已修正 (data/InstanceData/$uuid)"
   fi
 
   # 场景三：完整迁移
