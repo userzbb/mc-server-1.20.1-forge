@@ -47,12 +47,12 @@ if os.path.exists(secrets_path):
 
 # 执行 mv
 if sudo_pass:
-    r = subprocess.run(['sudo', '-S', 'mv', tmp.name, cfg_path], input=sudo_pass.encode(), capture_output=True, text=True)
+    r = subprocess.run(['sudo', '-S', 'mv', tmp.name, cfg_path], input=sudo_pass, capture_output=True, text=True)
     if r.returncode != 0:
-        # fallback: try writing directly
+        # fallback: 直接复制临时文件
         import shutil
         shutil.copy(tmp.name, cfg_path)
-    subprocess.run(['sudo', '-S', 'chmod', '644', cfg_path], input=sudo_pass.encode(), capture_output=True, text=True)
+    subprocess.run(['sudo', '-S', 'chmod', '644', cfg_path], input=sudo_pass, capture_output=True, text=True)
 else:
     subprocess.run(['sudo', 'mv', tmp.name, cfg_path], check=True)
     subprocess.run(['sudo', 'chmod', '644', cfg_path], check=True)
